@@ -254,21 +254,6 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        {/* 📈 Gráfico 2: Ventas por Fecha */}
-        <Card>
-          <CardContent className="p-4">
-            <h2 className="text-lg font-semibold mb-4">Ventas por Fecha</h2>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={salesByDate}>
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Line type="monotone" dataKey="total" stroke="#82ca9d" />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-        </div>
         {/* 🥧 Gráfico 3: Top Productos */}
         <Card>
           <CardContent className="p-4">
@@ -288,6 +273,22 @@ export default function Dashboard() {
                 </Pie>
                 <Tooltip />
               </PieChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+        
+        </div>
+        {/* 📈 Gráfico 2: Ventas por Fecha */}
+        <Card>
+          <CardContent className="p-4">
+            <h2 className="text-lg font-semibold mb-4">Ventas por Fecha</h2>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={salesByDate}>
+                <XAxis dataKey="date" />
+                <YAxis />
+                <Tooltip />
+                <Line type="monotone" dataKey="total" stroke="#82ca9d" />
+              </LineChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>

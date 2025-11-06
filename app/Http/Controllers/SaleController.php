@@ -109,6 +109,7 @@ class SaleController extends Controller
         $sale->load(['items.product', 'user', 'local']);
         return Inertia::render('Sales/Show', compact('sale'));
     }
+    
     public function statistics(Request $request)
     {
         $userId = $request->input('user_id');
@@ -116,7 +117,7 @@ class SaleController extends Controller
         $endDate = $request->input('end_date');
 
         $sales = Sale::query()
-            ->when($userId, fn($q) => $q->where('user_id', $userId))
+            ->when($userId && $userId !== 'none', fn($q) => $q->where('user_id', $userId))
             ->when($startDate, fn($q) => $q->whereDate('sales.created_at', '>=', $startDate))
             ->when($endDate, fn($q) => $q->whereDate('sales.created_at', '<=', $endDate));
 
@@ -136,10 +137,10 @@ class SaleController extends Controller
             ->get();
 
         // Productos más vendidos
-        $topProducts = \DB::table('sales')
-            ->selectRaw('products.name, SUM(sale_items.quantity) as total_sold')
+        $topProducts = $sales->clone()//\DB::table('sales')
             ->join('sale_items', 'sales.id', '=', 'sale_items.sale_id')
             ->join('products', 'products.id', '=', 'sale_items.product_id')
+            ->selectRaw('products.name, SUM(sale_items.quantity) as total_sold')
             ->groupBy('products.name')
             ->orderByDesc('total_sold')
             ->take(5)
