@@ -14,7 +14,7 @@ import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid, UsersRound, Workflow, 
-    LayoutList, ShoppingCart, List, House} from 'lucide-react';
+    LayoutList, ShoppingCart, List, House, MonitorOff} from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -32,6 +32,11 @@ const mainNavItems: NavItem[] = [
         title: 'Roles',
         href: '/roles',
         icon: Workflow,
+    },
+    {
+        title: 'Permissions',
+        href: '/permissions',
+        icon: MonitorOff,
     },
     {
         title: 'Products',

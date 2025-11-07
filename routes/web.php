@@ -10,6 +10,7 @@ use App\Http\Controllers\SaleController;
 use App\Http\Controllers\StockMovementController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\LocalController;
+use App\Http\Controllers\PermissionController;
 
 Route::get('/', function () {
     return Inertia::render('welcome', [
@@ -43,6 +44,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     //Locals routes
     Route::resource('locals', \App\Http\Controllers\LocalController::class);
+
+    //Permissions routes
+    Route::resource('permissions',PermissionController::class)
+                    ->only(["index", "show", "edit", "update"]);
     
 
     //Users routes
