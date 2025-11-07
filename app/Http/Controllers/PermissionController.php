@@ -14,8 +14,18 @@ class PermissionController extends Controller
      */
     public function index()
     {
+        $users = User::with(['roles', 'permissions'])->get()->map(function ($user) {
+            return [
+                'id' => $user->id,
+                'name' => $user->name,
+                'roles' => $user->roles->pluck('name'),
+                'direct_permissions' => $user->permissions->pluck('name'),
+                'role_permissions' => $user->getPermissionsViaRoles()->pluck('name'),
+            ];
+        });
+
         return Inertia::render('Permissions/Index', [
-            'users' => User::with('permissions')->get(),
+            'users' => $users,
         ]);
     }
 
@@ -40,10 +50,13 @@ class PermissionController extends Controller
      */
     public function show(string $id)
     {
-        $permission = Permission::find($id);
+        $user = User::with(['roles', 'permissions'])->findOrFail($id);
         return Inertia::render('Permissions/Show', [
-            'permission' => $permission,
-            'permissionUsers' => $permission->users->pluck('name'),
+            'user' => $user,
+            'directPermissions' => $user->permissions->pluck('name'),
+            'rolePermissions' => $user->getPermissionsViaRoles()->pluck('name'),
+            'permissions' => Permission::pluck('name'),
+            'roles' => $user->roles->pluck('name'),
         ]);
     }
 
@@ -52,11 +65,14 @@ class PermissionController extends Controller
      */
     public function edit(string $id)
     {
-        $user = User::find($id);
+        $user = User::with(['roles', 'permissions'])->findOrFail($id);
+
         return Inertia::render('Permissions/Edit', [
             'user' => $user,
-            'usersPermissions' => $user->permissions->pluck('name'),
+            'directPermissions' => $user->permissions->pluck('name'),
+            'rolePermissions' => $user->getPermissionsViaRoles()->pluck('name'),
             'permissions' => Permission::pluck('name'),
+            'roles' => $user->roles->pluck('name'),
         ]);
     }
 

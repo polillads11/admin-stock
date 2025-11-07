@@ -18,9 +18,11 @@ type EditProps = {
     };
     usersPermissions: string[];
     permissions: string[];
+    rolePermissions: string[];
+    
 };
 
-export default function Edit({ user, usersPermissions, permissions }: EditProps) {
+export default function Edit({ user, usersPermissions, permissions, rolePermissions }: EditProps) {
 
     const { data, setData, put,  errors } = useForm({
         name: user.name || '',
@@ -59,7 +61,36 @@ export default function Edit({ user, usersPermissions, permissions }: EditProps)
                             placeholder='Enter Name'/>
                         {errors.name && <p className='text-red-500 text-sm mt-1'>{errors.name}</p>}
                     </div>
-                    <div className='grid gap-2'>
+                    <div className="grid gap-2">
+                        <label className="text-sm font-medium">Permisos:</label>
+
+                        {permissions.map((perm) => {
+                            const isInherited = rolePermissions.includes(perm);
+                            const isChecked = data.permissions.includes(perm) || isInherited;
+
+                            return (
+                                <label key={perm} className="flex items-center space-x-2">
+                                    <input
+                                        type="checkbox"
+                                        checked={isChecked}
+                                        disabled={isInherited} // 🔒 bloquea los heredados
+                                        onChange={(e) => handleCheckboxChange(perm, e.target.checked)}
+                                        className={`form-checkbox h-5 w-5 rounded ${isInherited ? "text-green-500 opacity-70" : "text-blue-600"
+                                            }`}
+                                    />
+                                    <span
+                                        className={`text-sm ${isInherited ? "text-green-700 italic" : "text-gray-700"
+                                            }`}
+                                    >
+                                        {perm}
+                                        {isInherited && <span className="ml-1 text-xs text-green-600">(heredado)</span>}
+                                    </span>
+                                </label>
+                            );
+                        })}
+                    </div>
+
+                    {/*<div className='grid gap-2'>
                         <label htmlFor="permissions" 
                         className='text-sm leading-none font-medium select-none peer-disabled:cursor-not-allowed peer-disabled:opacity-50'>
                             Permissions:
@@ -77,7 +108,7 @@ export default function Edit({ user, usersPermissions, permissions }: EditProps)
                         </label>
                         ))}
                         {errors.permissions && <p className='text-red-500 text-sm mt-1'>{errors.permissions}</p>}
-                    </div>
+                    </div>*/}
                     <button type="submit" className='inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-blue-700 border border-transparent rounded-md shadow-sm hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'>
                         Update
                     </button>
