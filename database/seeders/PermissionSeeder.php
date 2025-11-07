@@ -22,19 +22,23 @@ class PermissionSeeder extends Seeder
             //'roles.create',
             //'roles.edit',
             //'roles.delete',
-            'products.view',
-            'products.create',
-            'products.edit',
-            'products.delete',
-            'categories.view',
-            'categories.create',
-            'categories.edit',
-            'categories.delete',
-            'sales.view',
-            'sales.create',
-            'sales.edit',
-            'sales.delete',
-            'stadistics.view'
+            //'products.view',
+            //'products.create',
+            //'products.edit',
+            //'products.delete',
+            //'categories.view',
+            //'categories.create',
+            //'categories.edit',
+            //'categories.delete',
+            //'sales.view',
+            //'sales.create',
+            //'sales.edit',
+            //'sales.delete',
+            //'stadistics.view'
+            'local.view',
+            'local.create',
+            'local.edit',
+            'local.delete'
         ];
 
         foreach ($permissions as $key => $value) {
