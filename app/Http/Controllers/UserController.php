@@ -7,6 +7,7 @@ use Inertia\Inertia;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class UserController extends Controller
 {
@@ -59,6 +60,9 @@ class UserController extends Controller
             $request->only(['name', 'email'])
             + ['password' => Hash::make($request->password)]
         );
+
+        $permissions = Permission::all();
+        $user->revokePermissionTo($permissions);
 
         $user->syncRoles($request->roles);
 

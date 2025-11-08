@@ -35,10 +35,12 @@ class PermissionSeeder extends Seeder
             //'sales.edit',
             //'sales.delete',
             //'stadistics.view'
-            'local.view',
-            'local.create',
-            'local.edit',
-            'local.delete'
+            //'local.view',
+            //'local.create',
+            //'local.edit',
+            //'local.delete'
+            'permissions.view',
+            'permissions.assign',
         ];
 
         foreach ($permissions as $key => $value) {

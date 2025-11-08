@@ -69,7 +69,7 @@ class PermissionController extends Controller
 
         return Inertia::render('Permissions/Edit', [
             'user' => $user,
-            'directPermissions' => $user->permissions->pluck('name'),
+            'usersPermissions' => $user->permissions->pluck('name'),
             'rolePermissions' => $user->getPermissionsViaRoles()->pluck('name'),
             'permissions' => Permission::pluck('name'),
             'roles' => $user->roles->pluck('name'),
