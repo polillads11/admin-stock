@@ -12,22 +12,37 @@ class PermissionController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::with(['roles', 'permissions'])->get()->map(function ($user) {
-            return [
+        $search = $request->input('search');
+
+        $users = User::query()
+            ->with(['roles', 'permissions'])
+            ->when($search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+                });
+            })
+            ->paginate(10) // 🔹 número de resultados por página
+            ->through(function ($user) {
+                return [
                 'id' => $user->id,
                 'name' => $user->name,
-                'roles' => $user->roles->pluck('name'),
-                'direct_permissions' => $user->permissions->pluck('name'),
-                'role_permissions' => $user->getPermissionsViaRoles()->pluck('name'),
-            ];
-        });
+                    'roles' => $user->roles->pluck('name'),
+                    'direct_permissions' => $user->permissions->pluck('name'),
+                    'role_permissions' => $user->getPermissionsViaRoles()->pluck('name'),
+                ];
+            });
 
         return Inertia::render('Permissions/Index', [
             'users' => $users,
+            'filters' => [
+                'search' => $search,
+            ],
         ]);
     }
+
 
     /**
      * Show the form for creating a new resource.

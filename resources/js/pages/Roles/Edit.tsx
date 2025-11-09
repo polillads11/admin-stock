@@ -6,7 +6,7 @@ import { route } from 'ziggy-js';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Roles Create',
+        title: 'Editar Rol',
         href: '/roles',
     },
 ];
@@ -42,14 +42,11 @@ export default function Edit({ role, rolePermissions, permissions }: EditProps) 
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Roles Create" />
+            <Head title="Editar Rol" />
             <div className='p-3'>
-                <Link href={route('roles.index')} className="cursor-pointer px-3 py-2 text-xs font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300">
-                    Back
-                </Link>
                 <form onSubmit={submit} className='space-y-6 mt-4 max-w-md mx-auto'>
                     <div className='grid gap-2'>
-                        <label htmlFor="name" className='text-sm leading-none font-medium select-none peer-disabled:cursor-not-allowed peer-disabled:opacity-50'>Name</label>
+                        <label htmlFor="name" className='text-sm leading-none font-medium select-none peer-disabled:cursor-not-allowed peer-disabled:opacity-50'>Nombre</label>
                         <input type="text"
                             id="name"
                             value={data.name}
@@ -62,7 +59,7 @@ export default function Edit({ role, rolePermissions, permissions }: EditProps) 
                     <div className='grid gap-2'>
                         <label htmlFor="permissions" 
                         className='text-sm leading-none font-medium select-none peer-disabled:cursor-not-allowed peer-disabled:opacity-50'>
-                            Permissions:
+                            Permisos:
                             </label>
                         {permissions.map((permission) => (
                         <label key={permission} className='flex items-center space-x-2'>
@@ -79,7 +76,7 @@ export default function Edit({ role, rolePermissions, permissions }: EditProps) 
                         {errors.permissions && <p className='text-red-500 text-sm mt-1'>{errors.permissions}</p>}
                     </div>
                     <button type="submit" className='inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-blue-700 border border-transparent rounded-md shadow-sm hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'>
-                        Create
+                        Editar
                     </button>
                 </form>
             </div>
