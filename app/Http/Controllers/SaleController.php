@@ -128,6 +128,14 @@ class SaleController extends Controller
             ->groupBy('locals.name')
             ->get();
 
+        // Ventas totales
+        $totalSales = $sales->clone()
+            ->sum('sales.total');
+
+        // Ventas totales
+        $amountSales = $sales->clone()
+            ->count('sales.id');
+
         // Ventas por día (últimos 30 días)
         $salesByDate = $sales->clone()
             ->selectRaw('DATE(sales.created_at) as date, SUM(total) as total')
@@ -151,6 +159,8 @@ class SaleController extends Controller
         $users = User::select('id', 'name')->get();
 
         return Inertia::render('Dashboard', [
+            'totalSales' => $totalSales,
+            'amountSales' => $amountSales,
             'salesByLocal' => $salesByLocal,
             'salesByDate' => $salesByDate,
             'topProducts' => $topProducts,
@@ -161,11 +171,5 @@ class SaleController extends Controller
                 'end_date' => $endDate,
             ]
         ]);
-
-        /*return Inertia::render('Sales/Statistics', [
-            'salesByLocal' => $salesByLocal,
-            'salesByDate' => $salesByDate,
-            'topProducts' => $topProducts,
-        ]);*/
     }
 }

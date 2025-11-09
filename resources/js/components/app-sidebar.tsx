@@ -19,12 +19,12 @@ import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
     {
-        title: 'Dashboard',
+        title: 'Panel',
         href: dashboard(),
         icon: LayoutGrid,
     },
     {
-        title: 'Users',
+        title: 'Usuarios',
         href: '/users',
         icon: UsersRound,
     },
@@ -34,27 +34,27 @@ const mainNavItems: NavItem[] = [
         icon: Workflow,
     },
     {
-        title: 'Permissions',
+        title: 'Permisos',
         href: '/permissions',
         icon: MonitorOff,
     },
     {
-        title: 'Products',
+        title: 'Productos',
         href: '/products',
         icon: LayoutList,
     },
     {
-        title: 'Sales',
+        title: 'Ventas',
         href: '/sales',
         icon: ShoppingCart,
     },
     {
-        title: 'Categories',
+        title: 'Categorias',
         href: '/categories',
         icon: List,
     },
     {
-        title: 'Locals',
+        title: 'Locales',
         href: '/locals',
         icon: House,
     },
@@ -62,13 +62,8 @@ const mainNavItems: NavItem[] = [
 
 const footerNavItems: NavItem[] = [
     {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
-    },
-    {
         title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
+        href: '',
         icon: BookOpen,
     },
 ];

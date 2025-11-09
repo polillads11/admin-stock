@@ -40,10 +40,10 @@ export default function Index({ users, filters }: { users: Pagination; filters: 
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Users" />
+            <Head title="Usuarios" />
             <div className='p-3'>
                 {can('user.create') && <Link href={route('users.create')}className="cursor-pointer px-3 py-2 text-xs font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300">
-                                    Create
+                                    Crear
                                 </Link>}
                 {/* Buscador */}
                     <form onSubmit={handleSearch} className="flex items-center mt-3">
@@ -58,7 +58,7 @@ export default function Index({ users, filters }: { users: Pagination; filters: 
                             type="submit"
                             className="ml-2 px-3 py-1 text-sm text-white bg-gray-600 rounded-lg hover:bg-gray-700"
                         >
-                            Search
+                            Buscar
                         </button>
                     </form>
                 <div className="overflow-x-auto mt-3">
@@ -66,10 +66,10 @@ export default function Index({ users, filters }: { users: Pagination; filters: 
                         <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
                             <th scope="col" className="px-6 py-3">ID</th>
-                            <th scope="col" className="px-6 py-3">Name</th>
+                            <th scope="col" className="px-6 py-3">Nombre</th>
                             <th scope="col" className="px-6 py-3">Email</th>
                             <th scope="col" className="px-6 py-3">Roles</th>
-                            <th scope="col" className="px-6 py-3 w-70">Actions</th>
+                            <th scope="col" className="px-6 py-3 w-70">Acciones</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -87,15 +87,15 @@ export default function Index({ users, filters }: { users: Pagination; filters: 
                             </td>
                             <td className="px-6 py-2 space-x-1">
                                 <Link href={route('users.show', id)} className="cursor-pointer px-3 py-2 text-xs font-medium text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300">
-                                    Show
+                                    Ver
                                 </Link>
                                 {can('user.edit') && <Link href={route('users.edit', id)} className="cursor-pointer px-3 py-2 text-xs font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300">
-                                    Edit
+                                    Editar
                                 </Link>}                              
                                 {can('user.delete') && <button 
                                 onClick={() => handleDelete(id)}
                                 className="cursor-pointer px-3 py-2 text-xs font-medium text-white bg-red-700 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300">
-                                    Delete
+                                    Eliminar
                                 </button>}
                             </td>
                         </tr>
