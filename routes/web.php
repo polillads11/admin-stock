@@ -38,7 +38,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
                     ->middleware("permission:products.edit");
 
     Route::resource('products', ProductController::class)
-                    ->only([ "distroy" ])
+                    ->only([ "destroy" ])
                     ->middleware("permission:products.delete");
         
     Route::resource('products', ProductController::class)
@@ -57,7 +57,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
                     ->middleware("permission:sales.edit");
 
     Route::resource('sales', SaleController::class)
-                    ->only([ "distroy" ])
+                    ->only([ "destroy" ])
                     ->middleware("permission:sales.delete");
         
     Route::resource('sales', SaleController::class)
@@ -74,7 +74,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
                     ->middleware("permission:categories.edit");
 
     Route::resource('categories', CategoryController::class)
-                    ->only([ "distroy" ])
+                    ->only([ "destroy" ])
                     ->middleware("permission:categories.delete");
         
     Route::resource('categories', CategoryController::class)
@@ -94,7 +94,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
                     ->middleware("permission:local.edit");
 
     Route::resource('locals', LocalController::class)
-                    ->only([ "distroy" ])
+                    ->only([ "destroy" ])
                     ->middleware("permission:local.delete");
         
     Route::resource('locals', LocalController::class)
