@@ -84,15 +84,15 @@ export default function Show() {
             <tr key={i.id} className="border-t">
               <td className="p-2">{i.product.name}</td>
               <td className="p-2">{i.quantity}</td>
-              <td className="p-2">${i.price.toFixed(2)}</td>
-              <td className="p-2">${i.subtotal.toFixed(2)}</td>
+              <td className="p-2">${i.price}</td>
+              <td className="p-2">${i.subtotal}</td>
             </tr>
           ))}
         </tbody>
       </table>
 
       <div className="text-right text-xl font-bold mt-4">
-        Total: ${sale.total.toFixed(2)}
+        Total: ${sale.total}
       </div>
     </div>
     </AppLayout>

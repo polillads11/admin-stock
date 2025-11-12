@@ -97,7 +97,7 @@ export default function Index({ sales, filters }: Props) {
                 <td className="p-2">
                   {sale.customer_name || "Cliente genérico"}
                 </td>
-                <td className="p-2">${sale.total.toFixed(2)}</td>
+                <td className="p-2">${sale.total}</td>
                 <td className="p-2">
                   <span
                     className={`px-2 py-1 rounded text-sm ${

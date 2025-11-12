@@ -99,7 +99,7 @@ export default function Show({ product }: { product: Product }) {
               Precio:
             </span>{" "}
             <span className="text-gray-900 dark:text-white">
-              ${product.price.toFixed(2)}
+              ${product.price}
             </span>
           </div>
 

@@ -1,211 +1,3 @@
-/*import React, { useState, useEffect } from "react";
-import { Head, router, Link} from "@inertiajs/react";
-import axios from "axios";
-import AppLayout from "@/layouts/app-layout";
-import { route } from "ziggy-js";
-
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-}
-
-interface SaleItem extends Product {
-  quantity: number;
-  subtotal: number;
-}
-
-export default function Create() {
-  const [search, setSearch] = useState("");
-  const [results, setResults] = useState<Product[]>([]);
-  const [items, setItems] = useState<SaleItem[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [customer_name, setCustomerName] = useState("");
-
-  
-
-  // Buscar productos (con debounce)
-  useEffect(() => {
-    const delay = setTimeout(() => {
-      if (search.length > 1) {
-        axios
-          .get(route("api.products.search"), { params: { q: search } })
-          .then((res) => setResults(res.data))
-          .catch(() => setResults([]));
-      } else {
-        setResults([]);
-      }
-    }, 400);
-    return () => clearTimeout(delay);
-  }, [search]);
-
-  // Agregar producto seleccionado
-  const addItem = (product: Product) => {
-    const exists = items.find((i) => i.id === product.id);
-    if (exists) {
-      const updated = items.map((i) =>
-        i.id === product.id
-          ? { ...i, quantity: i.quantity + 1, subtotal: (i.quantity + 1) * i.price }
-          : i
-      );
-      setItems(updated);
-    } else {
-      setItems([...items, { ...product, quantity: 1, subtotal: product.price }]);
-    }
-    setSearch("");
-    setResults([]);
-  };
-
-  // Cambiar cantidad manualmente
-  const updateQuantity = (id: number, quantity: number) => {
-    const updated = items.map((i) =>
-      i.id === id
-        ? { ...i, quantity, subtotal: quantity * i.price }
-        : i
-    );
-    setItems(updated);
-  };
-
-  // Eliminar producto
-  const removeItem = (id: number) => {
-    setItems(items.filter((i) => i.id !== id));
-  };
-
-  // Total de la venta
-  const total = items.reduce((sum, i) => sum + i.subtotal, 0);
-
-  // Enviar venta
-  const handleSubmit = async () => {
-    if (items.length === 0) return alert("Agrega al menos un producto.");
-
-    setLoading(true);
-    try {
-      await router.post(route("sales.store"), {
-        products: items.map((i) => ({
-          id: i.id,
-          quantity: i.quantity,
-        })),
-        customer_name,
-        total,
-      });
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <AppLayout>
-      <Head title="Nueva Venta" />
-
-      <div className="max-w-4xl mx-auto bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-md">
-        <h1 className="text-2xl font-semibold mb-4">Registrar Venta</h1>
-
-        <div>
-          <label className="font-semibold">Cliente</label>
-          <input
-            className="border rounded w-full p-2 mb-3"
-            value={customer_name}
-            onChange={(e) => setCustomerName(e.target.value)}
-          />
-        </div>
-
-        {/* Buscar productos *//*
-        <div className="relative mb-6">
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar producto..."
-            className="w-full border rounded-lg px-3 py-2"
-          />
-          {results.length > 0 && (
-            <ul className="absolute z-10 bg-white dark:bg-gray-800 border rounded-lg mt-1 w-full">
-              {results.map((product) => (
-                <li
-                  key={product.id}
-                  onClick={() => addItem(product)}
-                  className="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
-                >
-                  {product.name} — ${product.price.toFixed(2)}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-
-        {/* Tabla de productos *//*
-        {items.length > 0 ? (
-          <table className="w-full border-collapse mb-6">
-            <thead>
-              <tr className="bg-gray-100 dark:bg-gray-800">
-                <th className="text-left p-2">Producto</th>
-                <th className="p-2">Precio</th>
-                <th className="p-2">Cantidad</th>
-                <th className="p-2">Subtotal</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((item) => (
-                <tr key={item.id} className="border-t">
-                  <td className="p-2">{item.name}</td>
-                  <td className="p-2 text-center">${item.price.toFixed(2)}</td>
-                  <td className="p-2 text-center">
-                    <input
-                      type="number"
-                      min="1"
-                      value={item.quantity}
-                      onChange={(e) =>
-                        updateQuantity(item.id, parseInt(e.target.value) || 1)
-                      }
-                      className="w-16 text-center border rounded"
-                    />
-                  </td>
-                  <td className="p-2 text-center">${item.subtotal.toFixed(2)}</td>
-                  <td className="p-2 text-center">
-                    <button
-                      onClick={() => removeItem(item.id)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      ✕
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <p className="text-gray-500 text-center mb-6">
-            No hay productos agregados.
-          </p>
-        )}
-
-        {/* Total *//*
-        <div className="flex justify-between items-center">
-          <span className="text-xl font-semibold">
-            Total: ${total.toFixed(2)}
-          </span>
-          <button
-            disabled={loading}
-            onClick={handleSubmit}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg disabled:opacity-60"
-          >
-            {loading ? "Guardando..." : "Registrar Venta"}
-          </button>
-        </div>
-        <Link
-          href={route("sales.index")}
-          className="text-gray-700 underline"
-        >
-          ← Volver
-        </Link>
-      </div>
-    </AppLayout>
-  );
-}*/
-
 import { useState, useEffect } from "react";
 import { Head, router, Link, usePage} from "@inertiajs/react";
 import axios from "axios";
@@ -404,7 +196,7 @@ export default function Create() {
                   onClick={() => addItem(product)}
                   className="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
                 >
-                  {product.name} — ${product.price.toFixed(2)}
+                  {product.name} — ${product.price}
                 </li>
               ))}
             </ul>
@@ -428,7 +220,7 @@ export default function Create() {
               {items.map((item) => (
                 <tr key={item.id} className="border-t">
                   <td className="p-2">{item.name}</td>
-                  <td className="p-2 text-center">${item.price.toFixed(2)}</td>
+                  <td className="p-2 text-center">${item.price}</td>
                   <td className="p-2 text-center">{item.stock}</td>
                   <td className="p-2 text-center">
                     <input
@@ -441,7 +233,7 @@ export default function Create() {
                       className="w-16 text-center border rounded"
                     />
                   </td>
-                  <td className="p-2 text-center">${item.subtotal.toFixed(2)}</td>
+                  <td className="p-2 text-center">${item.subtotal}</td>
                   <td className="p-2 text-center">
                     <button
                       onClick={() => removeItem(item.id)}
@@ -463,7 +255,7 @@ export default function Create() {
         {/* Total y botón */}
         <div className="flex justify-between items-center">
           <span className="text-xl font-semibold">
-            Total: ${total.toFixed(2)}
+            Total: ${total}
           </span>
           <button
             disabled={loading}
