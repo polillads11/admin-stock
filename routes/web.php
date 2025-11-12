@@ -104,19 +104,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
     //Permissions routes
     Route::resource('permissions',PermissionController::class)
                     ->only(["create", "store"])
-                    ->middleware("permission:permiddions.create");
+                    ->middleware("permission:permissions.create");
 
     Route::resource('permissions', PermissionController::class)
                     ->only(["edit", "update"])
-                    ->middleware("permission:permiddions.assign");
+                    ->middleware("permission:permissions.assign");
 
     Route::resource('permissions', PermissionController::class)
                     ->only(["destroy"])
-                    ->middleware("permission:permiddions.delete");
+                    ->middleware("permission:permissions.delete");
 
     Route::resource('permissions', PermissionController::class)
                     ->only(["index", "show"])
-                    ->middleware("permission:permiddions.view|permiddions.create|permiddions.assign|permiddions.delete");
+                    ->middleware("permission:permissions.view|permissions.create|permissions.assign|permissions.delete");
     
 
     //Users routes
