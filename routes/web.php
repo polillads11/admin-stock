@@ -48,20 +48,75 @@ Route::middleware(['auth', 'verified'])->group(function () {
     //Sales routes
     Route::get('sales/statistics', [SaleController::class, 'statistics'])->name('sales.statistics');
 
-    Route::resource('sales', SaleController::class)->only(['index', 'create', 'store', 'show']);    
+    Route::resource('sales', SaleController::class)
+                    ->only(["create", "store"])
+                    ->middleware("permission:sales.create");
+
+    Route::resource('sales', SaleController::class)
+                    ->only(["edit", "update"])
+                    ->middleware("permission:sales.edit");
+
+    Route::resource('sales', SaleController::class)
+                    ->only([ "distroy" ])
+                    ->middleware("permission:sales.delete");
+        
+    Route::resource('sales', SaleController::class)
+                    ->only(["index", "show"])
+                    ->middleware("permission:sales.view|sales.create|sales.edit|sales.delete");       
 
     //Categories routes
-    Route::resource('categories', CategoryController::class)->only(['index', 'create', 'edit', 'store', 'update', 'destroy']);
+    Route::resource('categories', CategoryController::class)
+                    ->only(['create', 'store',])
+                    ->middleware("permission:categories.create");
+
+    Route::resource('categories', CategoryController::class)
+                    ->only(["edit", "update"])
+                    ->middleware("permission:categories.edit");
+
+    Route::resource('categories', CategoryController::class)
+                    ->only([ "distroy" ])
+                    ->middleware("permission:categories.delete");
+        
+    Route::resource('categories', CategoryController::class)
+                    ->only(["index", "show"])
+                    ->middleware("permission:categories.view|categories.create|categories.edit|categories.delete");
 
     //Stock Movements routes
     Route::get('stock-movements', [StockMovementController::class, 'index'])->name('stock-movements.index');
 
     //Locals routes
-    Route::resource('locals', \App\Http\Controllers\LocalController::class);
+    Route::resource('locals', \App\Http\Controllers\LocalController::class)
+                    ->only(['create', 'store',])
+                    ->middleware("permission:local.create");
+
+    Route::resource('locals', LocalController::class)
+                    ->only(["edit", "update"])
+                    ->middleware("permission:local.edit");
+
+    Route::resource('locals', LocalController::class)
+                    ->only([ "distroy" ])
+                    ->middleware("permission:local.delete");
+        
+    Route::resource('locals', LocalController::class)
+                    ->only(["index", "show"])
+                    ->middleware("permission:local.view|local.create|local.edit|local.delete");
 
     //Permissions routes
     Route::resource('permissions',PermissionController::class)
-                    ->only(["index", "show", "edit", "update"]);
+                    ->only(["create", "store"])
+                    ->middleware("permission:permiddions.create");
+
+    Route::resource('permissions', PermissionController::class)
+                    ->only(["edit", "update"])
+                    ->middleware("permission:permiddions.assign");
+
+    Route::resource('permissions', PermissionController::class)
+                    ->only(["destroy"])
+                    ->middleware("permission:permiddions.delete");
+
+    Route::resource('permissions', PermissionController::class)
+                    ->only(["index", "show"])
+                    ->middleware("permission:permiddions.view|permiddions.create|permiddions.assign|permiddions.delete");
     
 
     //Users routes

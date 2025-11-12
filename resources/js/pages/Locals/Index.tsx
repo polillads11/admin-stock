@@ -3,6 +3,7 @@ import { Head, Link, router } from "@inertiajs/react";
 import AppLayout from "@/layouts/app-layout";
 import { route } from "ziggy-js";
 import { type BreadcrumbItem } from '@/types';
+import { can } from '@/lib/can';
 
 interface Local {
   id: number;
@@ -31,12 +32,12 @@ export default function Index({ locals }: { locals: Local[] }) {
 
       <div className="flex justify-between items-center mb-4 p-2">
         <h1 className="text-2xl font-bold">Locales</h1>
-        <Link
+        {can('local.create') && (<Link
           href={route("locals.create")}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
           Nuevo Local
-        </Link>
+        </Link>)}
       </div>
 
       <table className="w-full border-collapse">
@@ -55,18 +56,18 @@ export default function Index({ locals }: { locals: Local[] }) {
               <td className="border p-2">{local.address || "-"}</td>
               <td className="border p-2">{local.phone || "-"}</td>
               <td className="border p-2 text-center">
-                <Link
+                {can('local.edit') && (<Link
                   href={route("locals.edit", local.id)}
                   className="text-blue-600 hover:underline mx-2"
                 >
                   Editar
-                </Link>
-                <button
+                </Link>)}
+                {can('local.delete') && (<button
                   onClick={() => handleDelete(local.id)}
                   className="text-red-600 hover:underline"
                 >
                   Eliminar
-                </button>
+                </button>)}
               </td>
             </tr>
           ))}

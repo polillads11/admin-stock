@@ -3,6 +3,7 @@ import { Link, router } from "@inertiajs/react";
 import { route } from 'ziggy-js';
 import AppLayout from "@/layouts/app-layout";
 import { type BreadcrumbItem } from '@/types';
+import { can } from '@/lib/can'
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -53,12 +54,12 @@ export default function Index({ sales, filters }: Props) {
               </Link>
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Ventas</h1>
-        <Link
+        {can('sales.create') && (<Link
           href={route("sales.create")}
           className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
         >
           Nueva Venta
-        </Link>
+        </Link>)}
       </div>
 
       {/* Buscador */}

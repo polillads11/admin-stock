@@ -3,6 +3,7 @@ import AppLayout from "@/layouts/app-layout";
 import { Head, Link, usePage, router } from "@inertiajs/react";
 import { route } from "ziggy-js";
 import { type BreadcrumbItem } from '@/types';
+import { can } from '@/lib/can';
 
 interface Category {
   id: number;
@@ -32,12 +33,13 @@ export default function Index({ categories }: { categories: { data: Category[] }
 
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Categorías</h1>
+        {can('categories.create') && (
         <Link
           href={route("categories.create")}
           className="px-4 py-2 bg-blue-600 text-white rounded-md"
         >
           Nueva Categoría
-        </Link>
+        </Link>)}
       </div>
 
       {flash?.success && (
@@ -60,18 +62,18 @@ export default function Index({ categories }: { categories: { data: Category[] }
               <td className="p-2 border">{category.name}</td>
               <td className="p-2 border">{category.slug}</td>
               <td className="p-2 border text-center">
-                <Link
+                {can('categories.edit') && (<Link
                   href={route("categories.edit", category.id)}
                   className="px-2 py-1 bg-yellow-500 text-white rounded mr-2"
                 >
                   Editar
-                </Link>
-                <button
+                </Link>)}
+                {can('categories.delete') && (<button
                   onClick={() => handleDelete(category.id)}
                   className="px-2 py-1 bg-red-600 text-white rounded"
                 >
                   Eliminar
-                </button>
+                </button>)}
               </td>
             </tr>
           ))}
