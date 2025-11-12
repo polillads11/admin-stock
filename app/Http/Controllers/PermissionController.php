@@ -98,7 +98,7 @@ class PermissionController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'permissions' => 'required|array',
+            'permissions' => 'array',
         ]);
 
         $user = User::find($id);
@@ -110,10 +110,14 @@ class PermissionController extends Controller
             'name' => $request->name,
         ]);
 
+        // Si no llega el campo, forzar a array vacío
+        $permissions = $request->input('permissions', []);
+
         $user->syncPermissions($request->permissions);
 
         return to_route('permissions.index')
             ->with('success', 'Permissions updated successfully.');
+        
     }
 
     /**

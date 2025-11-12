@@ -3,6 +3,7 @@ import { Link, usePage, router } from "@inertiajs/react";
 import { route } from 'ziggy-js';
 import AppLayout from "@/layouts/app-layout";
 import { type BreadcrumbItem } from '@/types';
+import { can } from '@/lib/can';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -50,6 +51,7 @@ export default function Index({ products, filters }: Props) {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <div className="p-6">
+        {can('products.create') && (
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-bold">Productos</h1>
           <Link
@@ -58,7 +60,7 @@ export default function Index({ products, filters }: Props) {
           >
             Nuevo
           </Link>
-        </div>
+        </div>)}
 
         <form onSubmit={handleSearch} className="mb-4">
           <input
@@ -96,14 +98,16 @@ export default function Index({ products, filters }: Props) {
                   <Link href={route('products.show', p.id)} className="cursor-pointer px-3 py-2 text-xs font-medium text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300">
                     Show
                   </Link>
+                  {can('products.edit') && ( 
                   <Link href={route('products.edit', p.id)} className="cursor-pointer px-3 py-2 text-xs font-medium text-white bg-yellow-500 rounded-lg hover:bg-yellow-600 focus:ring-4 focus:outline-none focus:ring-yellow-300">
                     Edit
-                  </Link>
+                  </Link>)}
+                  {can('products.delete') && ( 
                   <button
                     onClick={() => handleDelete(p.id)}
                     className="cursor-pointer px-3 py-2 text-xs font-medium text-white bg-red-700 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300">
                     Delete
-                  </button>
+                  </button>)}
                 </td>
               </tr>
             ))}

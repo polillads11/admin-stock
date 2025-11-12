@@ -45,9 +45,11 @@ export default function Index({ users, filters }: { users: Pagination; filters: 
             Crear
           </Link>
         )}
-
-        <Buscar initialValue={filters.search} onSearch={handleSearch} placeholder="Buscar por nombre o email..." />
-
+        
+        <div className='p-3'>
+          <Buscar initialValue={filters.search} onSearch={handleSearch} placeholder="Buscar por nombre o email..." />
+        </div>
+        
         <div className="overflow-x-auto mt-3">
           <table className='w-full text-ms text-left rtl:text-right text-gray-500 dark:text-gray-400'>
             <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">

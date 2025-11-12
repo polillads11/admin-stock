@@ -29,7 +29,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
     //Route::get('api/products/search', [ProductController::class, 'search']);
     Route::get('/products/search', [ProductController::class, 'search'])->name('api.products.search');
 
-    Route::resource('products', ProductController::class);
+    Route::resource('products', ProductController::class)
+                    ->only(["create", "store"])
+                    ->middleware("permission:products.create");
+
+    Route::resource('products', ProductController::class)
+                    ->only(["edit", "update"])
+                    ->middleware("permission:products.edit");
+
+    Route::resource('products', ProductController::class)
+                    ->only([ "distroy" ])
+                    ->middleware("permission:products.delete");
+        
+    Route::resource('products', ProductController::class)
+                    ->only(["index", "show"])
+                    ->middleware("permission:products.view|products.create|products.edit|products.delete");
     
     //Sales routes
     Route::get('sales/statistics', [SaleController::class, 'statistics'])->name('sales.statistics');

@@ -16,13 +16,14 @@ import { Link } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid, UsersRound, Workflow, 
     LayoutList, ShoppingCart, List, House, MonitorOff} from 'lucide-react';
 import AppLogo from './app-logo';
+import { can } from '@/lib/can';
 
 const mainNavItems: NavItem[] = [
     {
         title: 'Panel',
         href: dashboard(),
         icon: LayoutGrid,
-    },
+    }, 
     {
         title: 'Usuarios',
         href: '/users',

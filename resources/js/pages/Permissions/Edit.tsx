@@ -1,6 +1,7 @@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
+import { error } from 'console';
 import { permission } from 'process';
 import { route } from 'ziggy-js';
 
@@ -26,7 +27,7 @@ export default function Edit({ user, usersPermissions, permissions, rolePermissi
 
     const { data, setData, put,  errors } = useForm({
         name: user.name || '',
-        permissions: usersPermissions || []
+        permissions: usersPermissions ?? []
     });
 
     function submit(e: React.FormEvent) {
