@@ -92,7 +92,7 @@ export default function Index({ products, filters }: Props) {
                 <td className="p-2">{p.sku}</td>
                 <td className="p-2">{p.name}</td>
                 <td className="p-2">{p.category?.name ?? "-"}</td>
-                <td className="p-2">${p.price.toFixed(2)}</td>
+                <td className="p-2">${p.price}</td>
                 <td className="p-2">{p.stock}</td>
                 <td className="p-2">
                   <Link href={route('products.show', p.id)} className="cursor-pointer px-3 py-2 text-xs font-medium text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300">
