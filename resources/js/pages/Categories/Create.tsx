@@ -11,11 +11,11 @@ export default function Create() {
   });
 
   const breadcrumbs: BreadcrumbItem[] = [
-      {
-          title: 'Categories Create',
-          href: '/categories',
-      },
-    ];
+    {
+      title: 'Crear Categoria',
+      href: '/categories',
+    },
+  ];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,33 +24,35 @@ export default function Create() {
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title="Crear Categoría" />
-      <h1 className="text-2xl font-bold mb-4">Nueva Categoría</h1>
+      <div className="p-6 max-w-2xl mx-auto">
+        <Head title="Crear Categoría" />
+        <h1 className="text-2xl font-bold mb-4">Nueva Categoría</h1>
 
-      <form onSubmit={handleSubmit} className="max-w-md space-y-4">
-        <div>
-          <label className="block font-semibold">Nombre</label>
-          <input
-            type="text"
-            value={data.name}
-            onChange={(e) => setData("name", e.target.value)}
-            className="w-full border rounded p-2"
-          />
-          {errors.name && <div className="text-red-500 text-sm">{errors.name}</div>}
-        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block font-semibold">Nombre</label>
+            <input
+              type="text"
+              value={data.name}
+              onChange={(e) => setData("name", e.target.value)}
+              className="w-full border rounded p-2"
+            />
+            {errors.name && <div className="text-red-500 text-sm">{errors.name}</div>}
+          </div>
 
-        <div className="flex justify-between">
-          <Link href={route("categories.index")} className="text-gray-700">
-            ← Volver
-          </Link>
-        <button
-          type="submit"
-          className="px-4 py-2 bg-blue-600 text-white rounded"
-        >
-          Guardar
-        </button>
-        </div>
-      </form>
+          <div className="flex justify-between">
+            <Link href={route("categories.index")} className="text-gray-700">
+              ← Volver
+            </Link>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-blue-600 text-white rounded"
+            >
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
     </AppLayout>
   );
 }

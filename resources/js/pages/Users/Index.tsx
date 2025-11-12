@@ -7,7 +7,7 @@ import Buscar from '@/components/Buscar';
 import Paginacion from '@/components/Paginacion';
 
 const breadcrumbs: BreadcrumbItem[] = [
-  { title: 'Users', href: '/users' },
+  { title: 'Usuarios', href: '/users' },
 ];
 
 interface User {
@@ -38,27 +38,30 @@ export default function Index({ users, filters }: { users: Pagination; filters: 
       <Head title="Usuarios" />
       <div className='p-3'>
         {can('user.create') && (
-          <Link
-            href={route('users.create')}
-            className="cursor-pointer px-3 py-2 text-xs font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300"
-          >
-            Crear
-          </Link>
+          <div className='flex justify-between items-center mb-4'>
+            <h1 className="text-2xl font-bold">Lista de Usuarios</h1>
+            <Link
+              href={route('users.create')}
+              className="cursor-pointer px-3 py-2 text-xs font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300"
+            >
+              Nuevo Usuario
+            </Link>
+          </div>
         )}
-        
+
         <div className='p-3'>
           <Buscar initialValue={filters.search} onSearch={handleSearch} placeholder="Buscar por nombre o email..." />
         </div>
-        
+
         <div className="overflow-x-auto mt-3">
           <table className='w-full text-ms text-left rtl:text-right text-gray-500 dark:text-gray-400'>
             <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-              <tr>
+              <tr >
                 <th className="px-6 py-3">ID</th>
                 <th className="px-6 py-3">Nombre</th>
                 <th className="px-6 py-3">Email</th>
                 <th className="px-6 py-3">Roles</th>
-                <th className="px-6 py-3 w-70">Acciones</th>
+                <th className="px-6 py-3 w-70 flex justify-center">Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -75,6 +78,7 @@ export default function Index({ users, filters }: { users: Pagination; filters: 
                     ))}
                   </td>
                   <td className="px-6 py-2 space-x-1">
+                    <div className="flex justify-center gap-2">
                     <Link
                       href={route('users.show', id)}
                       className="cursor-pointer px-3 py-2 text-xs font-medium text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300"
@@ -97,6 +101,7 @@ export default function Index({ users, filters }: { users: Pagination; filters: 
                         Eliminar
                       </button>
                     )}
+                    </div>
                   </td>
                 </tr>
               ))}

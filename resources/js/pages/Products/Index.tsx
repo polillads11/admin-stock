@@ -50,10 +50,10 @@ export default function Index({ products, filters }: Props) {
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <div className="p-6">
+      <div className="p-3">
         {can('products.create') && (
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold">Productos</h1>
+          <h1 className="text-2xl font-bold">Lista de Productos</h1>
           <Link
             href={route("products.create")}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
