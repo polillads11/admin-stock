@@ -73,16 +73,17 @@ export default function Create() {
 
 
   const addItem = (product: Product) => {
+    const price = Number(product.price);
     const exists = items.find((i) => i.id === product.id);
     if (exists) {
       const updated = items.map((i) =>
         i.id === product.id
-          ? { ...i, quantity: i.quantity + 1, subtotal: (i.quantity + 1) * i.price }
+          ? { ...i, quantity: i.quantity + 1, subtotal: (i.quantity + 1) * price }
           : i
       );
       setItems(updated);
     } else {
-      setItems([...items, { ...product, quantity: 1, subtotal: product.price }]);
+      setItems([...items, { ...product, price, quantity: 1, subtotal: price }]);
     }
     setSearch("");
     setResults([]);
@@ -91,7 +92,7 @@ export default function Create() {
   const updateQuantity = (id: number, quantity: number) => {
     const updated = items.map((i) =>
       i.id === id
-        ? { ...i, quantity, subtotal: quantity * i.price }
+        ? { ...i, quantity, subtotal: quantity * Number(i.price) }
         : i
     );
     setItems(updated);
