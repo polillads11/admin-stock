@@ -120,6 +120,23 @@ class ProductController extends Controller
         return response()->json($products);
     }
 
+    public function byLocal(Request $request)
+    {
+        $localId = $request->local_id;
+
+        if (!$localId) {
+            return response()->json([]);
+        }
+
+        // Esto obtiene productos con stock por local
+        $products = Product::select('id', 'name', 'price', 'stock')
+            ->where('local_id', $localId)
+            ->orderBy('name', 'ASC')
+            ->get();
+
+        return response()->json($products);
+    }
+
     public function show(Product $product)
     {
         return Inertia::render('Products/Show', [

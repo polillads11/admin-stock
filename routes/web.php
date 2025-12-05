@@ -25,8 +25,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [SaleController::class, 'statistics'])->name('dashboard');
 
     //Products routes
-    // API para autocompletar
-    //Route::get('api/products/search', [ProductController::class, 'search']);
+    
+
+    Route::get('/products/byLocal', [ProductController::class, 'byLocal'])->name('api.products.byLocal');
+
     Route::get('/products/search', [ProductController::class, 'search'])->name('api.products.search');
 
     Route::resource('products', ProductController::class)

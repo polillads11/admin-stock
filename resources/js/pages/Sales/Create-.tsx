@@ -1,19 +1,18 @@
 import { useState, useEffect } from "react";
-import { Head, router, Link, usePage } from "@inertiajs/react";
+import { Head, router, Link, usePage} from "@inertiajs/react";
 import axios from "axios";
 import AppLayout from "@/layouts/app-layout";
 import { route } from "ziggy-js";
-import { type BreadcrumbItem } from "@/types";
+import { type BreadcrumbItem } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-  {
-    title: "Nueva Venta",
-    href: "/sales/create",
-  },
+    {
+        title: 'Nueva Venta',
+        href: '/sales/create',
+    },
 ];
 
 interface Product {
-  selected: boolean;
   id: number;
   name: string;
   price: number;
@@ -49,11 +48,6 @@ export default function Create() {
   const [loading, setLoading] = useState(false);
   const [customer_name, setCustomerName] = useState("");
 
-  // Modal
-  const [showModal, setShowModal] = useState(false);
-  const [localProducts, setLocalProducts] = useState<Product[]>([]);
-  const [loadingProducts, setLoadingProducts] = useState(false);
-
   // Buscar productos (con debounce)
   useEffect(() => {
     const delay = setTimeout(() => {
@@ -77,7 +71,8 @@ export default function Create() {
     return () => clearTimeout(delay);
   }, [search, localId]);
 
-  /*const addItem = (product: Product) => {
+
+  const addItem = (product: Product) => {
     const price = Number(product.price);
     const exists = items.find((i) => i.id === product.id);
     if (exists) {
@@ -92,29 +87,13 @@ export default function Create() {
     }
     setSearch("");
     setResults([]);
-  };*/
-  const addItem = (product: Product) => {
-    const price = Number(product.price);
-
-    setItems((prevItems) => {
-      const exists = prevItems.find((i) => i.id === product.id);
-
-      if (exists) {
-        return prevItems.map((i) =>
-          i.id === product.id
-            ? { ...i, quantity: i.quantity + 1, subtotal: (i.quantity + 1) * price }
-            : i
-        );
-      } else {
-        return [...prevItems, { ...product, quantity: 1, subtotal: price }];
-      }
-    });
   };
-
 
   const updateQuantity = (id: number, quantity: number) => {
     const updated = items.map((i) =>
-      i.id === id ? { ...i, quantity, subtotal: quantity * Number(i.price) } : i
+      i.id === id
+        ? { ...i, quantity, subtotal: quantity * Number(i.price) }
+        : i
     );
     setItems(updated);
   };
@@ -128,59 +107,34 @@ export default function Create() {
   const handleSubmit = async () => {
     if (!localId) return alert("Selecciona un local.");
     if (items.length === 0) return alert("Agrega al menos un producto.");
-    if (items.some((item) => item.quantity > item.stock))
-      return alert("La cantidad supera el stock disponible.");
+    if (items.some(item => item.quantity > item.stock)) return alert("La cantidad supera el stock disponible.");
 
     setLoading(true);
     try {
-      await router.post(
-        route("sales.store"),
-        {
-          local_id: localId,
-          products: items.map((i) => ({
-            id: i.id,
-            quantity: i.quantity,
-          })),
-          customer_name,
-          total,
+      await router.post(route("sales.store"), {
+        local_id: localId,
+        products: items.map((i) => ({
+          id: i.id,
+          quantity: i.quantity,
+        })),
+        customer_name,
+        total,
+      }, {
+        preserveScroll: true,
+        onSuccess: () => {
+          // recargar props para mostrar el mensaje flash
+          //router.reload({ only: ['flash'] });
+          // Limpiar formulario después de guardar
+          setCustomerName("");
+          //setLocalId("");
+          setItems([]);
+          setSearch("");
         },
-        {
-          preserveScroll: true,
-          onSuccess: () => {
-            setCustomerName("");
-            setItems([]);
-            setSearch("");
-          },
-        }
-      );
+      });
     } catch (e) {
       console.error(e);
     } finally {
       setLoading(false);
-    }
-  };
-
-  // Abrir modal de productos del local
-  const openModal = async () => {
-    if (!localId) {
-      return alert("Selecciona un local primero.");
-    }
-
-    setLoadingProducts(true);
-    setShowModal(true);
-
-    try {
-      const res = await axios.get(route("api.products.byLocal"), {
-        params: { local_id: localId },
-      });
-      setLocalProducts(res.data.map((p: any) => ({ ...p, selected: false })));
-
-      //setLocalProducts(res.data);
-    } catch (err) {
-      console.error(err);
-      setLocalProducts([]);
-    } finally {
-      setLoadingProducts(false);
     }
   };
 
@@ -191,13 +145,14 @@ export default function Create() {
       <div className="max-w-4xl mx-auto bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-md">
         <h1 className="text-2xl font-semibold mb-4">Registrar Venta</h1>
 
+        {/* ✅ Mensaje de éxito */}
         {flash.success && (
           <div className="mb-4 p-3 rounded bg-green-100 text-green-700 border border-green-300">
             {flash.success}
           </div>
         )}
 
-        {/* Local */}
+        {/* Selección de local */}
         <div className="mb-4">
           <label className="font-semibold">Local</label>
           <select
@@ -224,8 +179,9 @@ export default function Create() {
           />
         </div>
 
-        {/* Buscar + modal */}
-        <div className="relative mb-6 flex gap-2">
+        {/* Buscar productos */}
+        {/* Buscar productos */}
+        <div className="relative mb-6">
           <input
             type="text"
             value={search}
@@ -233,16 +189,8 @@ export default function Create() {
             placeholder="Buscar producto..."
             className="w-full border rounded-lg px-3 py-2"
           />
-
-          <button
-            className="bg-gray-700 text-white px-4 rounded-lg"
-            onClick={openModal}
-          >
-            Ver productos
-          </button>
-
           {results.length > 0 && (
-            <ul className="absolute z-10 bg-white dark:bg-gray-800 border rounded-lg mt-12 w-full">
+            <ul className="absolute z-10 bg-white dark:bg-gray-800 border rounded-lg mt-1 w-full">
               {results.map((product) => (
                 <li
                   key={product.id}
@@ -256,7 +204,7 @@ export default function Create() {
           )}
         </div>
 
-        {/* Tabla productos agregados */}
+        {/* Tabla de productos */}
         {items.length > 0 ? (
           <table className="w-full border-collapse mb-6">
             <thead>
@@ -305,9 +253,11 @@ export default function Create() {
           </p>
         )}
 
-        {/* Total */}
+        {/* Total y botón */}
         <div className="flex justify-between items-center">
-          <span className="text-xl font-semibold">Total: ${total}</span>
+          <span className="text-xl font-semibold">
+            Total: ${total}
+          </span>
           <button
             disabled={loading}
             onClick={handleSubmit}
@@ -324,91 +274,6 @@ export default function Create() {
           ← Volver
         </Link>
       </div>
-
-      {/* MODAL DE PRODUCTOS */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-900 p-6 w-full max-w-2xl rounded-lg shadow-lg relative">
-
-            <h2 className="text-xl font-semibold mb-4">
-              Seleccionar productos
-            </h2>
-
-            {/* Botón agregar seleccionados */}
-            <div className="flex justify-end mb-3">
-              <button
-                className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
-                disabled={localProducts.length === 0}
-                onClick={() => {
-                  const selectedProducts = localProducts.filter(p => p.selected);
-
-                  selectedProducts.forEach(p => addItem(p));
-
-                  setLocalProducts(prev => prev.map(p => ({ ...p, selected: false })));
-                  setShowModal(false);
-                }}
-
-              >
-                Agregar seleccionados
-              </button>
-            </div>
-
-            {loadingProducts ? (
-              <p className="text-center py-4">Cargando productos...</p>
-            ) : localProducts.length === 0 ? (
-              <p className="text-center py-4 text-gray-500">
-                No hay productos en este local.
-              </p>
-            ) : (
-              <div className="max-h-80 overflow-y-auto border rounded">
-                <table className="w-full border-collapse">
-                  <thead>
-                    <tr className="bg-gray-100 dark:bg-gray-800">
-                      <th className="p-2 text-center">✔</th>
-                      <th className="p-2 text-left">Producto</th>
-                      <th className="p-2">Precio</th>
-                      <th className="p-2">Stock</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {localProducts.map((product) => (
-                      <tr key={product.id} className="border-t">
-                        <td className="p-2 text-center">
-                          <input
-                            type="checkbox"
-                            checked={product.selected || false}
-                            onChange={(e) => {
-                              setLocalProducts(prev =>
-                                prev.map(p =>
-                                  p.id === product.id
-                                    ? { ...p, selected: e.target.checked }
-                                    : p
-                                )
-                              );
-                            }}
-                          />
-                        </td>
-                        <td className="p-2">{product.name}</td>
-                        <td className="p-2 text-center">${product.price}</td>
-                        <td className="p-2 text-center">{product.stock}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-
-            {/* Botón cerrar */}
-            <button
-              className="absolute top-2 right-3 text-gray-600 text-xl"
-              onClick={() => setShowModal(false)}
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-      )}
-
     </AppLayout>
   );
 }
