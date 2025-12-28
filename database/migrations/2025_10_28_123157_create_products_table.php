@@ -13,7 +13,6 @@ return new class extends Migration {
             $table->text('description')->nullable();
             $table->foreignId('category_id')->nullable()->constrained()->nullOnDelete();
             $table->decimal('price', 12, 2)->default(0);
-            $table->integer('stock')->default(0);
             $table->timestamps();
         });
     }

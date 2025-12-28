@@ -19,6 +19,11 @@ class StockMovement extends Model
         return $this->belongsTo(Product::class);
     }
 
+    public function productLocalStock()
+    {
+        return $this->belongsTo(ProductLocalStock::class);
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class, 'created_by');

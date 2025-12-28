@@ -18,9 +18,11 @@ class Product extends Model
         return $this->belongsTo(Category::class);
     }
 
-    public function local()
+    public function locals()
     {
-        return $this->belongsTo(Local::class);
+        return $this->belongsToMany(Local::class, 'product_local_stocks')
+                ->withPivot('stock')
+                ->withTimestamps();
     }
 
 
