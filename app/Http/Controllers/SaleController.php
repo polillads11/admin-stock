@@ -6,6 +6,7 @@ use App\Models\Sale;
 use App\Models\SaleItem;
 use App\Models\Product;
 use App\Models\StockMovement;
+use App\Models\ProductLocalStock;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -49,7 +50,7 @@ class SaleController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'local_id' => 'required|exists:locals,id', // 👈 nuevo campo obligatorio
+            'local_id' => 'required|exists:locals,id',
             'customer_name' => 'nullable|string|max:255',
             'products' => 'required|array|min:1',
             'products.*.id' => 'required|exists:products,id',
@@ -58,20 +59,37 @@ class SaleController extends Controller
         ]);
 
         DB::transaction(function () use ($validated) {
+
             $sale = Sale::create([
                 'user_id' => auth()->id(),
-                'local_id' => $validated['local_id'], // 👈 guardamos el local elegido
+                'local_id' => $validated['local_id'],
                 'customer_name' => $validated['customer_name'] ?? null,
                 'total' => $validated['total'],
                 'status' => 'completed',
             ]);
 
             foreach ($validated['products'] as $p) {
-                $product = Product::find($p['id']);
+
+                $product = Product::findOrFail($p['id']);
                 $quantity = $p['quantity'];
+
+                // 🔒 Obtener registro de stock por producto + local
+                $productLocalStock = ProductLocalStock::where('product_id', $product->id)
+                    ->where('local_id', $validated['local_id'])
+                    ->lockForUpdate()
+                    ->first();
+
+                if (!$productLocalStock) {
+                    throw new \Exception("No existe stock para {$product->name} en este local.");
+                }
+
+                if ($productLocalStock->stock < $quantity) {
+                    throw new \Exception("Stock insuficiente para {$product->name}.");
+                }
+
                 $subtotal = $product->price * $quantity;
 
-                // ✅ Crear el ítem de venta
+                // ✅ Crear item de venta
                 SaleItem::create([
                     'sale_id' => $sale->id,
                     'product_id' => $product->id,
@@ -81,25 +99,23 @@ class SaleController extends Controller
                 ]);
 
                 // ✅ Descontar stock
-                //$product->decrement('stock', $quantity);
-                // Actualizar stock del producto
-                $product->stock = max(0, $product->stock - $p['quantity']);
-                $product->save();
+                $productLocalStock->stock -= $quantity;
+                $productLocalStock->save();
 
-                // ✅ Registrar movimiento de stock
+                // ✅ Registrar movimiento
                 StockMovement::create([
-                    'product_id' => $product->id,
+                    'product_local_stock_id' => $productLocalStock->id,
                     'quantity' => -$quantity,
-                    'type' => 'out',
-                    'description' => "Venta #{$sale->id} (Local {$sale->local_id})",
-                    'user_id' => auth()->id(),
+                    'type' => 'sale',
+                    'reference_type' => 'sale',
+                    'reference_id' => $sale->id,
+                    'note' => "Venta #{$sale->id}",
+                    'created_by' => auth()->id(),
                 ]);
             }
         });
 
-        return redirect()
-                ->route('sales.create')
-                    ->with('success', 'Venta registrada correctamente.');
+        return redirect()->back()->with('success', 'Venta registrada correctamente.');
     }
 
         
