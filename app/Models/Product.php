@@ -25,6 +25,16 @@ class Product extends Model
                 ->withTimestamps();
     }
 
+    public function localStocks()
+    {
+        return $this->hasMany(ProductLocalStock::class);
+    }
+    
+    // ✅ accesor: stock total
+    public function getTotalStockAttribute()
+    {
+        return $this->localStocks->sum('stock');
+    }
 
     public function stockMovements()
     {

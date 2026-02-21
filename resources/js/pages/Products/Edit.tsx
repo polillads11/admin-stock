@@ -16,11 +16,6 @@ interface Category {
   name: string;
 }
 
-interface Local {
-  id: number;
-  name: string;
-}
-
 interface Product {
   id: number;
   sku: string;
@@ -28,18 +23,14 @@ interface Product {
   description: string;
   category_id: number;
   price: number;
-  stock: number;
-  local_id: number;
 }
 
 export default function Edit({
   product,
   categories,
-  locals,
 }: {
   product: Product;
   categories: Category[];
-  locals: Local[];
 }) {
   const [form, setForm] = useState({
     sku: product.sku,
@@ -47,8 +38,6 @@ export default function Edit({
     description: product.description || "",
     category_id: product.category_id,
     price: product.price,
-    stock: product.stock,
-    local_id: product.local_id,
   });
 
   const [loading, setLoading] = useState(false);
@@ -150,35 +139,6 @@ export default function Edit({
               required
             />
           </div>
-
-          {/* Stock */}
-          <div>
-            <label className="block font-semibold mb-1">Stock</label>
-            <input
-              type="number"
-              name="stock"
-              value={form.stock}
-              onChange={handleChange}
-              className="border rounded w-full p-2 dark:bg-gray-800 dark:text-white"
-              required
-            />
-          </div>
-          {/* Local */}
-        <div>
-          <label className="block font-semibold">Local</label>
-          <select
-            value={form.local_id}
-            onChange={handleChange}
-            className="w-full border rounded p-2"
-          >
-            <option value="">Seleccionar local</option>
-            {locals.map((local) => (
-              <option key={local.id} value={local.id}>
-                {local.name}
-              </option>
-            ))}
-          </select>
-        </div>
           </div>
 
           {/* Botones */}

@@ -21,4 +21,9 @@ class Local extends Model
                     ->withPivot('stock')
                     ->withTimestamps();
     }
+
+    public function productStocks()
+    {
+        return $this->hasMany(ProductLocalStock::class);
+    }
 }

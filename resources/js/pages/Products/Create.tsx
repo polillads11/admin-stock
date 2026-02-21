@@ -33,8 +33,6 @@ export default function Create({ categories, locals }: Props) {
     description: "",
     category_id: "",
     price: "",
-    stock: "",
-    local_id: "",
   });
 
   const submit = (e: React.FormEvent) => {
@@ -93,26 +91,6 @@ export default function Create({ categories, locals }: Props) {
           </select>
         </div>
 
-        {/* Local */}
-        <div>
-          <label className="block font-semibold">Local</label>
-          <select
-            value={data.local_id}
-            onChange={(e) => setData("local_id", e.target.value)}
-            className="w-full border rounded p-2"
-          >
-            <option value="">Seleccionar local</option>
-            {locals.map((local) => (
-              <option key={local.id} value={local.id}>
-                {local.name}
-              </option>
-            ))}
-          </select>
-          {errors.local_id && (
-            <div className="text-red-600">{errors.local_id}</div>
-          )}
-        </div>
-
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block font-semibold">Precio</label>
@@ -121,15 +99,6 @@ export default function Create({ categories, locals }: Props) {
               className="border rounded w-full p-2"
               value={data.price}
               onChange={(e) => setData("price", e.target.value)}
-            />
-          </div>
-          <div>
-            <label className="block font-semibold">Stock</label>
-            <input
-              type="number"
-              className="border rounded w-full p-2"
-              value={data.stock}
-              onChange={(e) => setData("stock", e.target.value)}
             />
           </div>
         </div>

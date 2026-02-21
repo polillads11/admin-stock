@@ -22,7 +22,7 @@ interface Product {
   sku: string;
   name: string;
   price: number;
-  stock: number;
+  total_stock: number;
   category?: Category;
 }
 
@@ -82,7 +82,7 @@ export default function Index({ products, filters }: Props) {
               <th className="p-2">Nombre</th>
               <th className="p-2">Categoría</th>
               <th className="p-2">Precio</th>
-              <th className="p-2">Stock</th>
+              <th className="p-2">Stock Total</th>
               <th className="p-2">Acciones</th>
             </tr>
           </thead>
@@ -93,7 +93,7 @@ export default function Index({ products, filters }: Props) {
                 <td className="p-2">{p.name}</td>
                 <td className="p-2">{p.category?.name ?? "-"}</td>
                 <td className="p-2">${p.price}</td>
-                <td className="p-2">{p.stock}</td>
+                <td className="p-2">{p.total_stock}</td>
                 <td className="p-2">
                   <Link href={route('products.show', p.id)} className="cursor-pointer px-3 py-2 text-xs font-medium text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300">
                     Show
@@ -101,6 +101,10 @@ export default function Index({ products, filters }: Props) {
                   {can('products.edit') && ( 
                   <Link href={route('products.edit', p.id)} className="cursor-pointer px-3 py-2 text-xs font-medium text-white bg-yellow-500 rounded-lg hover:bg-yellow-600 focus:ring-4 focus:outline-none focus:ring-yellow-300">
                     Edit
+                  </Link>)}
+                  {can('products.edit') && ( 
+                  <Link href={route('products.stock', p.id)} className="cursor-pointer px-3 py-2 text-xs font-medium text-white bg-yellow-500 rounded-lg hover:bg-yellow-600 focus:ring-4 focus:outline-none focus:ring-yellow-300">
+                    Edit Stock
                   </Link>)}
                   {can('products.delete') && ( 
                   <button

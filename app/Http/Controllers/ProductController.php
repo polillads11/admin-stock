@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Local;
+use App\Models\ProductLocalStock;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class ProductController extends Controller
@@ -17,15 +19,15 @@ class ProductController extends Controller
 
     public function index(Request $request)
     {
-        $query = Product::query()
-            ->with('category')
+        $products = Product::with(['category'])
+            ->withSum('localStocks as total_stock', 'stock')
             ->when($request->search, fn($q) =>
                 $q->where('name', 'like', "%{$request->search}%")
-                  ->orWhere('sku', 'like', "%{$request->search}%")
+                ->orWhere('sku', 'like', "%{$request->search}%")
             )
-            ->orderBy('id', 'desc');
-
-        $products = $query->paginate(10)->withQueryString();
+            ->orderBy('id', 'desc')
+            ->paginate(10)
+            ->withQueryString();
 
         return Inertia::render('Products/Index', [
             'products' => $products,
@@ -47,12 +49,39 @@ class ProductController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'category_id' => 'nullable|exists:categories,id',
-            'local_id' => 'nullable|exists:locals,id',
             'price' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
+
+            // nuevos
+            //'local_id' => 'required|exists:locals,id',
+            //'stock' => 'required|integer|min:0',
         ]);
 
-        Product::create($data);
+        DB::transaction(function () use ($data) {
+            $product = Product::create($data);
+
+            // crear stock en 0 para cada local
+            Local::all()->each(function ($local) use ($product) {
+                ProductLocalStock::create([
+                    'product_id' => $product->id,
+                    'local_id' => $local->id,
+                    'stock' => 0
+                ]);
+            });
+        });
+
+        /*$product = Product::create([
+            'sku' => $data['sku'],
+            'name' => $data['name'],
+            'description' => $data['description'] ?? null,
+            'category_id' => $data['category_id'] ?? null,
+            'price' => $data['price'],
+        ]);
+
+        ProductLocalStock::create([
+            'product_id' => $product->id,
+            'local_id' => $data['local_id'],
+            'stock' => $data['stock'],
+        ]);*/
 
         return redirect()->route('products.index')
             ->with('success', 'Producto creado correctamente.');
@@ -75,9 +104,7 @@ class ProductController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'category_id' => 'nullable|exists:categories,id',
-            'local_id' => 'nullable|exists:locals,id',
-            'price' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
+            'price' => 'required|numeric|min:0'
         ]);
 
         $product->update($data);
@@ -98,24 +125,26 @@ class ProductController extends Controller
     // 🔍 API: búsqueda para autocompletar productos (por nombre o SKU)
     public function search(Request $request)
     {
-        $query = $request->input('q', '');
+        $query = $request->input('q');
         $localId = $request->input('local_id');
 
-        if (strlen($query) < 2) {
+        if (strlen($query) < 2 || !$localId) {
             return response()->json([]);
         }
 
-        $products = Product::where(function ($q) use ($query) {
+        $products = ProductLocalStock::with('product')
+            ->where('local_id', $localId)
+            ->whereHas('product', function ($q) use ($query) {
                 $q->where('name', 'like', "%{$query}%")
                 ->orWhere('sku', 'like', "%{$query}%");
             })
-            ->where(function($q) use ($localId) {
-                if ($localId) {
-                    $q->where('local_id', $localId);
-                }
-            })
-            ->take(10)
-            ->get(['id', 'name', 'price', 'stock']);
+            ->get()
+            ->map(fn ($pls) => [
+                'id' => $pls->product->id,
+                'name' => $pls->product->name,
+                'price' => $pls->product->price,
+                'stock' => $pls->stock,
+            ]);
 
         return response()->json($products);
     }
@@ -128,19 +157,30 @@ class ProductController extends Controller
             return response()->json([]);
         }
 
-        // Esto obtiene productos con stock por local
-        $products = Product::select('id', 'name', 'price', 'stock')
+        $products = ProductLocalStock::with('product')
             ->where('local_id', $localId)
-            ->orderBy('name', 'ASC')
-            ->get();
+            ->orderBy(Product::select('name')
+                ->whereColumn('products.id', 'product_local_stocks.product_id'))
+            ->get()
+            ->map(fn ($pls) => [
+                'id' => $pls->product->id,
+                'name' => $pls->product->name,
+                'price' => $pls->product->price,
+                'stock' => $pls->stock,
+            ]);
 
         return response()->json($products);
     }
 
     public function show(Product $product)
-    {
+        {
+            $product->load([
+            'category',
+            'localStocks.local',
+        ]);
+
         return Inertia::render('Products/Show', [
-            'product' => $product->load('category', 'local'),
+            'product' => $product,
         ]);
     }
 }

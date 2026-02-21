@@ -154,6 +154,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('roles', RoleController::class)
                     ->only(["index", "show"])
                     ->middleware("permission:roles.view|roles.create|roles.edit|roles.delete");
+
+    //manejo de stock de productos por local
+    Route::get('products/{product}/stock', [\App\Http\Controllers\ProductStockController::class, 'edit'])
+        ->name('products.stock');
+    
+    Route::put('products/{product}/stock', [\App\Http\Controllers\ProductStockController::class, 'update'])
+        ->name('products.stock.edit')
+        ->middleware("permission:products.edit");
+    
+    Route::put('products/{product}/stock', [\App\Http\Controllers\ProductStockController::class, 'update'])
+        ->name('products.stock.update')
+        ->middleware("permission:products.edit");
 });
 
 require __DIR__.'/settings.php';

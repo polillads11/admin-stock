@@ -26,129 +26,111 @@ interface Product {
   sku: string;
   name: string;
   description?: string;
-  category: Category;
-  local: Local;
   price: number;
-  stock: number;
   created_at: string;
   updated_at: string;
+  category?: {
+    id: number;
+    name: string;
+  };
+  local_stocks: Array<{
+    id: number;
+    stock: number;
+    local: {
+      id: number;
+      name: string;
+    };
+  }>;
 }
 
 export default function Show({ product }: { product: Product }) {
-  
+  const totalStock = product.local_stocks.reduce(
+    (sum, ls) => sum + ls.stock,
+    0
+  );
+
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={`Producto: ${product.name}`} />
 
       <div className="max-w-3xl mx-auto bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-md">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-semibold text-gray-800 dark:text-white">
+          <h1 className="text-2xl font-semibold">
             Detalles del Producto
           </h1>
+
           <button
             onClick={() => router.visit(route("products.index"))}
-            className="px-4 py-2 rounded-lg bg-gray-300 dark:bg-gray-700 hover:bg-gray-400 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200"
+            className="px-4 py-2 rounded bg-gray-300 dark:bg-gray-700"
           >
             Volver
           </button>
         </div>
 
-        <div className="border-t border-gray-300 dark:border-gray-700 pt-4 space-y-3">
-          <div>
-            <span className="font-semibold text-gray-700 dark:text-gray-300">
-              SKU:
-            </span>{" "}
-            <span className="text-gray-900 dark:text-white">{product.sku}</span>
-          </div>
+        {/* Datos generales */}
+        <div className="space-y-2 mb-6">
+          <div><b>SKU:</b> {product.sku}</div>
+          <div><b>Nombre:</b> {product.name}</div>
+          <div><b>Descripción:</b> {product.description}</div>
+          <div><b>Categoría:</b> {product.category?.name ?? "—"}</div>
+          <div><b>Precio:</b> ${product.price}</div>
 
           <div>
-            <span className="font-semibold text-gray-700 dark:text-gray-300">
-              Nombre:
-            </span>{" "}
-            <span className="text-gray-900 dark:text-white">{product.name}</span>
-          </div>
-
-          <div>
-            <span className="font-semibold text-gray-700 dark:text-gray-300">
-              Descripción:
+            <b>Stock total:</b>{" "}
+            <span className={totalStock > 0 ? "text-green-600" : "text-red-600"}>
+              {totalStock}
             </span>
-            <p className="text-gray-800 dark:text-gray-200 mt-1 whitespace-pre-line">
-              {product.description || "Sin descripción"}
-            </p>
-          </div>
-
-          <div>
-            <span className="font-semibold text-gray-700 dark:text-gray-300">
-              Categoría:
-            </span>{" "}
-            <span className="text-gray-900 dark:text-white">
-              {product.category?.name || "Sin categoría"}
-            </span>
-          </div>
-          <div>
-            <span className="font-semibold text-gray-700 dark:text-gray-300">
-              Local:
-            </span>{" "}
-            <span className="text-gray-900 dark:text-white">
-              {product.local?.name || "Sin local"}
-            </span>
-          </div>
-
-          <div>
-            <span className="font-semibold text-gray-700 dark:text-gray-300">
-              Precio:
-            </span>{" "}
-            <span className="text-gray-900 dark:text-white">
-              ${product.price}
-            </span>
-          </div>
-
-          <div>
-            <span className="font-semibold text-gray-700 dark:text-gray-300">
-              Stock disponible:
-            </span>{" "}
-            <span
-              className={`font-semibold ${
-                product.stock > 0
-                  ? "text-green-600 dark:text-green-400"
-                  : "text-red-600 dark:text-red-400"
-              }`}
-            >
-              {product.stock}
-            </span>
-          </div>
-
-          <div className="text-sm text-gray-500 dark:text-gray-400 mt-6">
-            <p>
-              Creado: {new Date(product.created_at).toLocaleString("es-AR")}
-            </p>
-            <p>
-              Actualizado: {new Date(product.updated_at).toLocaleString("es-AR")}
-            </p>
           </div>
         </div>
 
-        {/* Botones de acción */}
+        {/* STOCK POR LOCAL */}
+        <h2 className="text-lg font-semibold mb-2">Stock por local</h2>
+
+        <table className="w-full border rounded">
+          <thead className="bg-gray-200 dark:bg-gray-700">
+            <tr>
+              <th className="p-2 text-left">Local</th>
+              <th className="p-2 text-right">Stock</th>
+            </tr>
+          </thead>
+          <tbody>
+            {product.local_stocks.map((ls) => (
+              <tr key={ls.id} className="border-t">
+                <td className="p-2">{ls.local.name}</td>
+                <td
+                  className={`p-2 text-right font-semibold ${
+                    ls.stock > 0 ? "text-green-600" : "text-red-600"
+                  }`}
+                >
+                  {ls.stock}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {/* Botones */}
         <div className="flex justify-end space-x-3 mt-6">
           <button
-            onClick={() => router.visit(route("products.edit", product.id))}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+            onClick={() =>
+              router.visit(route("products.stock", product.id))
+            }
+            className="bg-indigo-600 text-white px-4 py-2 rounded"
           >
-            Editar
+            Editar stock
           </button>
 
           <button
-            onClick={() => {
-              if (confirm("¿Seguro que deseas eliminar este producto?")) {
-                router.delete(route("products.destroy", product.id));
-              }
-            }}
-            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
+            onClick={() =>
+              router.visit(route("products.edit", product.id))
+            }
+            className="bg-blue-600 text-white px-4 py-2 rounded"
           >
-            Eliminar
+            Editar producto
           </button>
         </div>
       </div>
     </AppLayout>
   );
 }
+

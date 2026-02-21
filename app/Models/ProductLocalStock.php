@@ -9,12 +9,8 @@ class ProductLocalStock extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'product_id',
-        'local_id',
-        'stock',
-    ];
-    
+    protected $fillable = ['product_id', 'local_id', 'stock'];
+
     public function product()
     {
         return $this->belongsTo(Product::class);
@@ -25,7 +21,7 @@ class ProductLocalStock extends Model
         return $this->belongsTo(Local::class);
     }
 
-    public function movements()
+    public function stockMovements()
     {
         return $this->hasMany(StockMovement::class);
     }
