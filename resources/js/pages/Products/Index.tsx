@@ -95,23 +95,38 @@ export default function Index({ products, filters }: Props) {
                 <td className="p-2">${p.price}</td>
                 <td className="p-2">{p.total_stock}</td>
                 <td className="p-2">
-                  <Link href={route('products.show', p.id)} className="cursor-pointer px-3 py-2 text-xs font-medium text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300">
-                    Show
-                  </Link>
-                  {can('products.edit') && ( 
-                  <Link href={route('products.edit', p.id)} className="cursor-pointer px-3 py-2 text-xs font-medium text-white bg-yellow-500 rounded-lg hover:bg-yellow-600 focus:ring-4 focus:outline-none focus:ring-yellow-300">
-                    Edit
-                  </Link>)}
-                  {can('products.edit') && ( 
-                  <Link href={route('products.stock', p.id)} className="cursor-pointer px-3 py-2 text-xs font-medium text-white bg-yellow-500 rounded-lg hover:bg-yellow-600 focus:ring-4 focus:outline-none focus:ring-yellow-300">
-                    Edit Stock
-                  </Link>)}
-                  {can('products.delete') && ( 
-                  <button
-                    onClick={() => handleDelete(p.id)}
-                    className="cursor-pointer px-3 py-2 text-xs font-medium text-white bg-red-700 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300">
-                    Delete
-                  </button>)}
+                  <div className="inline-flex rounded-md shadow-sm overflow-hidden border border-gray-200">
+
+                    <Link
+                      href={route('products.show', p.id)}
+                      className="px-2 py-1 text-xs font-medium text-white bg-green-600 hover:bg-green-700 border-r border-green-500">
+                      Mostrar
+                    </Link>
+
+                    {can('products.edit') && (
+                      <Link
+                        href={route('products.edit', p.id)}
+                        className="px-2 py-1 text-xs font-medium text-white bg-yellow-500 hover:bg-yellow-600 border-r border-yellow-400">
+                        Editar
+                      </Link>
+                    )}
+
+                    {can('products.edit') && (
+                      <Link
+                        href={route('products.stock', p.id)}
+                        className="px-2 py-1 text-xs font-medium text-white bg-orange-500 hover:bg-orange-600 border-r border-orange-400">
+                        Stock
+                      </Link>
+                    )}
+
+                    {can('products.delete') && (
+                      <button
+                        onClick={() => handleDelete(p.id)}
+                        className="px-2 py-1 text-xs font-medium text-white bg-red-600 hover:bg-red-700">
+                        Eliminar
+                      </button>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
