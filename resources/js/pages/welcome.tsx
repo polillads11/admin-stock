@@ -1,6 +1,6 @@
 import { Link } from '@inertiajs/react';
 import { route } from 'ziggy-js';
-import logo from '../assets/logo.png';
+import logo from '../assets/Logo.png';
 
 interface Auth {
     user: { name: string; email: string } | null;
