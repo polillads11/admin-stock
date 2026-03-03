@@ -56,18 +56,20 @@ export default function Index({ locals }: { locals: Local[] }) {
               <td className="border p-2">{local.address || "-"}</td>
               <td className="border p-2">{local.phone || "-"}</td>
               <td className="border p-2 text-center">
+                <div className="inline-flex rounded-md shadow-sm overflow-hidden border border-gray-200">
                 {can('local.edit') && (<Link
                   href={route("locals.edit", local.id)}
-                  className="text-blue-600 hover:underline mx-2"
+                  className="px-2 py-1 text-xs font-medium text-white bg-yellow-600 hover:bg-yellow-700"
                 >
                   Editar
                 </Link>)}
                 {can('local.delete') && (<button
                   onClick={() => handleDelete(local.id)}
-                  className="text-red-600 hover:underline"
+                  className="px-2 py-1 text-xs font-medium text-white bg-red-600 hover:bg-red-700"
                 >
                   Eliminar
                 </button>)}
+                </div>
               </td>
             </tr>
           ))}

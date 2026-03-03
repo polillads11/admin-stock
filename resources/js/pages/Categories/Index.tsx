@@ -62,18 +62,20 @@ export default function Index({ categories }: { categories: { data: Category[] }
               <td className="p-2 border">{category.name}</td>
               <td className="p-2 border">{category.slug}</td>
               <td className="p-2 border text-center">
+                <div className="inline-flex rounded-md shadow-sm overflow-hidden border border-gray-200">
                 {can('categories.edit') && (<Link
                   href={route("categories.edit", category.id)}
-                  className="px-2 py-1 bg-yellow-500 text-white rounded mr-2"
+                  className="px-2 py-1 text-xs font-medium text-white bg-yellow-600 hover:bg-yellow-700"
                 >
                   Editar
                 </Link>)}
                 {can('categories.delete') && (<button
                   onClick={() => handleDelete(category.id)}
-                  className="px-2 py-1 bg-red-600 text-white rounded"
+                  className="px-2 py-1 text-xs font-medium text-white bg-red-600 hover:bg-red-700"
                 >
                   Eliminar
                 </button>)}
+                </div>
               </td>
             </tr>
           ))}
