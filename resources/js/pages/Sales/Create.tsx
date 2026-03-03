@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Head, router, Link, usePage } from "@inertiajs/react";
 import axios from "axios";
 import AppLayout from "@/layouts/app-layout";
 import { route } from "ziggy-js";
 import { type BreadcrumbItem } from "@/types";
+import BarcodeScannerModal from "../../components/BarcodeScannerModal";
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -54,6 +55,35 @@ export default function Create() {
   const [localProducts, setLocalProducts] = useState<Product[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
 
+  const [showScanner, setShowScanner] = useState(false);
+
+  const handleBarcodeDetected = async (code: string) => {
+    if (!localId) {
+      alert("Selecciona un local primero.");
+      return;
+    }
+
+    try {
+      const res = await axios.get(route("api.products.byBarcode"), {
+        params: {
+          barcode: code,
+          local_id: localId,
+        },
+      });
+
+      const product = res.data;
+
+      if (product) {
+        addItem(product);
+      } else {
+        alert("Producto no encontrado");
+      }
+    } catch (error) {
+      alert("Producto no encontrado");
+    }
+    setShowScanner(false); 
+  };
+
   // Buscar productos (con debounce)
   useEffect(() => {
     const delay = setTimeout(() => {
@@ -77,22 +107,6 @@ export default function Create() {
     return () => clearTimeout(delay);
   }, [search, localId]);
 
-  /*const addItem = (product: Product) => {
-    const price = Number(product.price);
-    const exists = items.find((i) => i.id === product.id);
-    if (exists) {
-      const updated = items.map((i) =>
-        i.id === product.id
-          ? { ...i, quantity: i.quantity + 1, subtotal: (i.quantity + 1) * price }
-          : i
-      );
-      setItems(updated);
-    } else {
-      setItems([...items, { ...product, price, quantity: 1, subtotal: price }]);
-    }
-    setSearch("");
-    setResults([]);
-  };*/
   const addItem = (product: Product) => {
     const price = Number(product.price);
 
@@ -123,7 +137,13 @@ export default function Create() {
     setItems(items.filter((i) => i.id !== id));
   };
 
-  const total = items.reduce((sum, i) => sum + i.subtotal, 0);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  const total = items.reduce((sum, i) => sum + i.quantity * Number(i.price), 0);
 
   const handleSubmit = async () => {
     if (!localId) return alert("Selecciona un local.");
@@ -224,15 +244,45 @@ export default function Create() {
           />
         </div>
 
-        {/* Buscar + modal */}
+        
+        {/* Scanner */}
         <div className="relative mb-6 flex gap-2">
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+
+                if (results.length === 1) {
+                  addItem(results[0]);
+                  setSearch("");
+                  setResults([]);
+                }
+              }
+            }}
             placeholder="Buscar producto..."
             className="w-full border rounded-lg px-3 py-2"
           />
+
+          {results.length > 0 && (
+          <ul className="absolute z-10 bg-white dark:bg-gray-800 border rounded-lg mt-12 w-full">
+            {results.map((product) => (
+              <li
+                key={product.id}
+                onClick={() => {
+                  addItem(product);
+                  setSearch("");
+                  setResults([]);
+                }}
+                className="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+              >
+                {product.name} — ${product.price}
+              </li>
+            ))}
+          </ul>
+        )}
 
           <button
             className="bg-gray-700 text-white px-4 rounded-lg"
@@ -241,20 +291,21 @@ export default function Create() {
             Ver productos
           </button>
 
-          {results.length > 0 && (
-            <ul className="absolute z-10 bg-white dark:bg-gray-800 border rounded-lg mt-12 w-full">
-              {results.map((product) => (
-                <li
-                  key={product.id}
-                  onClick={() => addItem(product)}
-                  className="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
-                >
-                  {product.name} — ${product.price}
-                </li>
-              ))}
-            </ul>
-          )}
+          <button
+            className="bg-green-600 text-white px-4 rounded-lg"
+            onClick={() => setShowScanner(true)}
+          >
+            📷 Escanear
+          </button>
         </div>
+
+        
+
+        <BarcodeScannerModal
+          isOpen={showScanner}
+          onDetected={handleBarcodeDetected}
+          onClose={() => setShowScanner(false)}
+        />
 
         {/* Tabla productos agregados */}
         {items.length > 0 ? (
