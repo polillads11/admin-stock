@@ -1,5 +1,5 @@
-import React from "react";
-import { Head, useForm, Link } from "@inertiajs/react";
+import React, { useState, useEffect } from "react";
+import { Head, useForm, Link, usePage } from "@inertiajs/react";
 import AppLayout from "@/layouts/app-layout";
 import { route } from "ziggy-js";
 import { type BreadcrumbItem } from '@/types';
@@ -11,6 +11,17 @@ export default function Create() {
     address: "",
     phone: "",
   });
+
+  const { flash } = usePage().props as any;
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  useEffect(() => {
+    if (flash?.success) {
+      setShowSuccess(true);
+      const timer = setTimeout(() => setShowSuccess(false), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [flash?.success]);
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -28,6 +39,12 @@ export default function Create() {
     <AppLayout breadcrumbs={breadcrumbs}>
       <div className="p-6 max-w-2x1 mx-auto">
         <Head title="Nuevo Local" />
+
+          {showSuccess && (
+            <div className="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
+            {flash.success}
+          </div>
+        )}
 
         <h1 className="text-2xl font-bold mb-4">Nuevo Local</h1>
 

@@ -41,7 +41,7 @@ class LocalController extends Controller
 
         Local::create($validated);
 
-        return redirect()->route('locals.index')->with('success', 'Local creado correctamente.');
+        return redirect()->route('locals.create')->with('success', 'Local creado correctamente.');
     }
 
     /**

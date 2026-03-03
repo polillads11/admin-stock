@@ -83,7 +83,7 @@ class ProductController extends Controller
             'stock' => $data['stock'],
         ]);*/
 
-        return redirect()->route('products.index')
+        return redirect()->route('products.create')
             ->with('success', 'Producto creado correctamente.');
     }
 
