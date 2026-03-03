@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Local;
+use App\Models\Product;
+use App\Models\ProductLocalStock;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class LocalController extends Controller
@@ -39,7 +42,18 @@ class LocalController extends Controller
             'phone' => 'nullable|string|max:50',
         ]);
 
-        Local::create($validated);
+        DB::transaction(function () use ($validated) {
+            $local = Local::create($validated);
+
+            // Crear stock en 0 para cada producto existente
+            Product::all()->each(function ($product) use ($local) {
+                ProductLocalStock::create([
+                    'product_id' => $product->id,
+                    'local_id' => $local->id,
+                    'stock' => 0
+                ]);
+            });
+        });
 
         return redirect()->route('locals.create')->with('success', 'Local creado correctamente.');
     }
