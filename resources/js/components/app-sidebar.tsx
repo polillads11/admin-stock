@@ -68,7 +68,7 @@ const mainNavItems: NavItem[] = [
 
 const footerNavItems: NavItem[] = [
     {
-        title: 'Documentation',
+        title: 'Documentación',
         href: '',
         icon: BookOpen,
     },
