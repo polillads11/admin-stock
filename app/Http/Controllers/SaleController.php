@@ -42,13 +42,13 @@ class SaleController extends Controller
         $locals = Local::all(['id', 'name']); // 👈 enviamos lista de locales al frontend
         $products = Product::all(['id', 'name', 'price', 'stock']);
 
-        // determinar oferta activa más alta
-        $offer = Offer::active()->orderByDesc('discount')->first();
+        // todas las ofertas activas con sus productos
+        $offers = Offer::active()->with('products')->get();
 
         return Inertia::render('Sales/Create', [
             'locals' => $locals,
             'products' => $products,
-            'offer' => $offer,
+            'offers' => $offers,
         ]);
     }
 
@@ -60,17 +60,26 @@ class SaleController extends Controller
             'products' => 'required|array|min:1',
             'products.*.id' => 'required|exists:products,id',
             'products.*.quantity' => 'required|integer|min:1',
-            'offer_id' => 'nullable|exists:offers,id',
-            'discount' => 'nullable|numeric|min:0',
         ]);
 
-        DB::transaction(function () use ($validated) {
-            $offer = null;
-            if (!empty($validated['offer_id'])) {
-                $offer = Offer::active()->find($validated['offer_id']);
-            }
+        $appliedNames = [];
+        DB::transaction(function () use ($validated, &$appliedNames) {
+            $offers = Offer::active()->with('products')->get();
 
-            // preparar items y calcular subtotal total, aplicando descuento por producto si hay oferta
+            // construir mapa de cantidades de los productos en la venta
+            $saleQuantities = collect($validated['products'])->mapWithKeys(function($p){
+                return [$p['id'] => $p['quantity']];
+            });
+
+            // determinar qué ofertas son aplicables (tienen todos sus productos presentes con cantidad suficiente)
+            $applicableOffers = $offers->filter(function($offer) use ($saleQuantities) {
+                return $offer->products->every(function($prod) use ($saleQuantities) {
+                    $required = $prod->pivot->quantity ?? 1;
+                    return isset($saleQuantities[$prod->id]) && $saleQuantities[$prod->id] >= $required;
+                });
+            });
+
+            // para cada venta, el precio unitario será base menos el mayor descuento entre las ofertas aplicables que incluyan ese producto
             $total = 0;
             $preparedItems = [];
 
@@ -91,11 +100,14 @@ class SaleController extends Controller
                     throw new \Exception("Stock insuficiente para {$product->name}.");
                 }
 
-                $pricePerUnit = $product->price;
-                if ($offer) {
-                    $pricePerUnit = round($pricePerUnit * (1 - $offer->discount / 100), 2);
+                $bestDiscount = 0;
+                foreach ($applicableOffers as $app) {
+                    if ($app->products->contains('id', $product->id)) {
+                        $bestDiscount = max($bestDiscount, $app->discount);
+                    }
                 }
 
+                $pricePerUnit = round($product->price * (1 - $bestDiscount / 100), 2);
                 $subtotal = $pricePerUnit * $quantity;
                 $total += $subtotal;
 
@@ -103,12 +115,19 @@ class SaleController extends Controller
             }
 
             $discountAmount = 0;
-            if ($offer) {
-                // descuento total = diferencia entre suma original y suma con precio descontado
+            if ($applicableOffers->count()) {
                 $originalTotal = array_sum(array_map(fn($it) => $it['product']->price * $it['quantity'], $preparedItems));
                 $discountAmount = round($originalTotal - $total, 2);
             }
             $finalTotal = $total;
+
+            // guardar ID de una oferta representativa (la de mayor descuento) si hay
+            $offerId = null;
+            if ($applicableOffers->count()) {
+                $offerId = $applicableOffers->sortByDesc('discount')->first()->id;
+                // record names for flash
+                $appliedNames = $applicableOffers->pluck('name')->toArray();
+            }
 
             $sale = Sale::create([
                 'user_id' => auth()->id(),
@@ -116,7 +135,7 @@ class SaleController extends Controller
                 'customer_name' => $validated['customer_name'] ?? null,
                 'total' => $finalTotal,
                 'status' => 'completed',
-                'offer_id' => $offer?->id,
+                'offer_id' => $offerId,
                 'discount' => $discountAmount,
             ]);
 
@@ -151,13 +170,28 @@ class SaleController extends Controller
             }
         });
 
-        return redirect()->back()->with('success', 'Venta registrada correctamente.');
+        $message = 'Venta registrada correctamente.';
+        if (!empty($appliedNames)) {
+            $message .= ' Ofertas aplicadas: ' . implode(', ', $appliedNames) . '.';
+        }
+        return redirect()->back()->with('success', $message);
     }       
 
     public function show(Sale $sale)
     {
         $sale->load(['items.product', 'user', 'local', 'offer']);
-        return Inertia::render('Sales/Show', compact('sale'));
+
+        // determine applied offers again for display
+        $offers = Offer::active()->with('products')->get();
+        $quantities = $sale->items->pluck('quantity', 'product_id');
+        $appliedOffers = $offers->filter(function($off) use ($quantities) {
+            return $off->products->every(function($prod) use ($quantities) {
+                $req = $prod->pivot->quantity ?? 1;
+                return isset($quantities[$prod->id]) && $quantities[$prod->id] >= $req;
+            });
+        })->pluck('name');
+
+        return Inertia::render('Sales/Show', compact('sale', 'appliedOffers'));
     }
     
     public function statistics(Request $request)

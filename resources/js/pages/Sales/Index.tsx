@@ -25,6 +25,7 @@ interface Sale {
   status: string;
   created_at: string;
   user: User;
+  offer?: { name: string };
 }
 
 interface Props {
@@ -84,6 +85,7 @@ export default function Index({ sales, filters }: Props) {
             <th className="p-2">#</th>
             <th className="p-2">Cliente</th>
             <th className="p-2">Total</th>
+            <th className="p-2">Oferta</th>
             <th className="p-2">Descuento</th>
             <th className="p-2">Estado</th>
             <th className="p-2">Vendedor</th>
@@ -100,6 +102,7 @@ export default function Index({ sales, filters }: Props) {
                   {sale.customer_name || "Cliente genérico"}
                 </td>
                 <td className="p-2">${sale.total}</td>
+                <td className="p-2">{sale.offer?.name || '-'}</td>
                 <td className="p-2">${sale.discount || 0}</td>
                 <td className="p-2">
                   <span

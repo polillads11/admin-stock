@@ -17,6 +17,7 @@ class OfferController extends Controller
             ->when($search, function ($query, $search) {
                 $query->where('name', 'like', "%{$search}%");
             })
+            ->withCount('products')
             ->orderBy('id', 'desc')
             ->paginate(10)
             ->withQueryString();
@@ -31,18 +32,31 @@ class OfferController extends Controller
 
     public function create()
     {
-        return Inertia::render('Offers/Create');
+        $products = \App\Models\Product::select('id', 'name')->get();
+        return Inertia::render('Offers/Create', [
+            'products' => $products,
+        ]);
     }
 
     public function store(OfferRequest $request)
     {
-        Offer::create($request->validated());
+        $data = $request->validated();
+        $offer = Offer::create($data);
+
+        if (!empty($data['products'])) {
+            $sync = [];
+            foreach ($data['products'] as $p) {
+                $sync[$p['id']] = ['quantity' => $p['quantity'] ?? 1];
+            }
+            $offer->products()->sync($sync);
+        }
 
         return redirect()->route('offers.index')->with('success', 'Oferta creada correctamente.');
     }
 
     public function show(Offer $offer)
     {
+        $offer->load('products');
         return Inertia::render('Offers/Show', [
             'offer' => $offer,
         ]);
@@ -50,14 +64,28 @@ class OfferController extends Controller
 
     public function edit(Offer $offer)
     {
+        $offer->load('products');
+        $products = \App\Models\Product::select('id', 'name')->get();
         return Inertia::render('Offers/Edit', [
             'offer' => $offer,
+            'products' => $products,
         ]);
     }
 
     public function update(OfferRequest $request, Offer $offer)
     {
-        $offer->update($request->validated());
+        $data = $request->validated();
+        $offer->update($data);
+
+        if (!empty($data['products'])) {
+            $sync = [];
+            foreach ($data['products'] as $p) {
+                $sync[$p['id']] = ['quantity' => $p['quantity'] ?? 1];
+            }
+            $offer->products()->sync($sync);
+        } else {
+            $offer->products()->detach();
+        }
 
         return redirect()->route('offers.index')->with('success', 'Oferta actualizada correctamente.');
     }

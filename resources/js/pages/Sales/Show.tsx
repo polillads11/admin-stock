@@ -42,7 +42,7 @@ interface Sale {
 }
 
 export default function Show() {
-  const { sale } = usePage().props as unknown as { sale: Sale };
+  const { sale, appliedOffers = [] } = usePage().props as unknown as { sale: Sale; appliedOffers?: string[] };
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
@@ -98,10 +98,10 @@ export default function Show() {
         </tbody>
       </table>
 
-      {sale.offer && (
+      {appliedOffers.length > 0 && (
         <div className="text-right mt-2">
           <span className="text-sm text-gray-600">
-            Oferta aplicada: {sale.offer.name} ({sale.offer.discount}% )
+            Oferta(s) aplicadas: {appliedOffers.join(', ')}
           </span>
           <br />
           <span className="text-sm text-gray-600">

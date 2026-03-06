@@ -4,7 +4,8 @@ import AppLayout from "@/layouts/app-layout";
 import { route } from "ziggy-js";
 import { type BreadcrumbItem } from '@/types';
 
-export default function Edit({ offer }: any) {
+export default function Edit({ offer, products }: any) {
+  const existingProducts = offer.products || [];
   const { data, setData, put, errors } = useForm<{
     name: string;
     description: string;
@@ -12,6 +13,7 @@ export default function Edit({ offer }: any) {
     start_date: string;
     end_date: string;
     active: boolean;
+    products: Array<{id:number, quantity:number}>;
   }>({
     name: offer.name || "",
     description: offer.description || "",
@@ -19,7 +21,10 @@ export default function Edit({ offer }: any) {
     start_date: offer.start_date || "",
     end_date: offer.end_date || "",
     active: offer.active || false,
+    products: existingProducts.map((p: any) => ({ id: p.id, quantity: p.pivot.quantity })),
   });
+
+  const availableProducts = products || [];
 
   const { flash } = usePage().props as any;
   const [showSuccess, setShowSuccess] = useState(false);
@@ -123,6 +128,47 @@ export default function Edit({ offer }: any) {
               />
               Activa
             </label>
+          </div>
+
+          {/* Productos afectados */}
+          <div>
+            <label className="block font-semibold mb-1">Productos (dejar vacío para aplicar a todos)</label>
+            <div className="space-y-2 max-h-48 overflow-y-auto border p-2">
+              {availableProducts.map((prod: any) => {
+                const selected = data.products.find((p: any) => p.id === prod.id);
+                return (
+                  <div key={prod.id} className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={!!selected}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setData("products", [...data.products, { id: prod.id, quantity: 1 }]);
+                        } else {
+                          setData("products", data.products.filter((p: any) => p.id !== prod.id));
+                        }
+                      }}
+                    />
+                    <span>{prod.name}</span>
+                    {selected && (
+                      <input
+                        type="number"
+                        min="1"
+                        value={selected.quantity}
+                        onChange={(e) => {
+                          const q = parseInt(e.target.value) || 1;
+                          setData("products", data.products.map((p: any) =>
+                            p.id === prod.id ? { ...p, quantity: q } : p
+                          ));
+                        }}
+                        className="w-16 border rounded p-1"
+                      />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+            {errors.products && <div className="text-red-500 text-sm">{errors.products}</div>}
           </div>
 
           <div className="flex justify-between">

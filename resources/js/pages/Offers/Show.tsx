@@ -23,6 +23,18 @@ export default function Show({ offer }: any) {
         <p>Inicio: {offer.start_date || '-'} </p>
         <p>Fin: {offer.end_date || '-'}</p>
         <p>Activa: {offer.active ? 'Sí' : 'No'}</p>
+        {offer.products && offer.products.length > 0 && (
+          <div>
+            <h2 className="font-semibold mt-4">Productos incluidos:</h2>
+            <ul className="list-disc list-inside">
+              {offer.products.map((p: any) => (
+                <li key={p.id}>
+                  {p.name} {p.pivot?.quantity && `(x${p.pivot.quantity})`}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         <Link href={route("offers.index")} className="text-blue-600">
           ← Volver

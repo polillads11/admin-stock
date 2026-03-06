@@ -21,16 +21,19 @@ interface Product {
   stock: number;
 }
 
+interface OfferData {
+  id: number;
+  name: string;
+  discount: number;
+  products: { id: number; pivot: { quantity: number } }[];
+}
+
 interface PageProps extends Record<string, any> {
   locals: Local[];
   flash: {
     success?: string;
   };
-  offer?: {
-    id: number;
-    name: string;
-    discount: number;
-  } | null;
+  offers?: OfferData[];
 }
 
 interface Local {
@@ -41,13 +44,14 @@ interface Local {
 interface SaleItem extends Product {
   quantity: number;
   subtotal: number;
+  basePrice: number;
 }
 
 export default function Create() {
   const { props } = usePage<PageProps>();
   const locals = props.locals || [];
   const flash = props.flash || {};
-  const offer = props.offer || null;
+  const offers = props.offers || [];
 
   const [localId, setLocalId] = useState<string>("");
   const [search, setSearch] = useState("");
@@ -62,6 +66,13 @@ export default function Create() {
   const [loadingProducts, setLoadingProducts] = useState(false);
 
   const [showScanner, setShowScanner] = useState(false);
+
+  // compute applicable offers from items
+  const applicableOffers = offers.filter((off) =>
+    off.products.every((p) =>
+      items.find((i) => i.id === p.id && i.quantity >= (p.pivot.quantity || 1))
+    )
+  );
 
   const handleBarcodeDetected = async (code: string) => {
     if (!localId) {
@@ -115,7 +126,14 @@ export default function Create() {
 
   const addItem = (product: Product) => {
     const basePrice = Number(product.price);
-    const price = offer ? +(basePrice * (1 - offer.discount / 100)).toFixed(2) : basePrice;
+    // determine best discount for this product from currently applicable offers
+    let best = 0;
+    applicableOffers.forEach((off) => {
+      if (off.products.some(p => p.id === product.id)) {
+        best = Math.max(best, off.discount);
+      }
+    });
+    const price = +(basePrice * (1 - best / 100)).toFixed(2);
 
     setItems((prevItems) => {
       const exists = prevItems.find((i) => i.id === product.id);
@@ -127,7 +145,7 @@ export default function Create() {
             : i
         );
       } else {
-        return [...prevItems, { ...product, quantity: 1, subtotal: price, price } as SaleItem];
+        return [...prevItems, { ...product, quantity: 1, subtotal: price, price, basePrice } as SaleItem];
       }
     });
   };
@@ -139,6 +157,36 @@ export default function Create() {
     );
     setItems(updated);
   };
+
+  // recalc prices/subtotals when applicable offers or items list change
+  useEffect(() => {
+    if (items.length === 0) return;
+    // determine applicable offers again (might have changed due to items change)
+    const applicable = offers.filter((off) =>
+      off.products.every((p) =>
+        items.find((i) => i.id === p.id && i.quantity >= (p.pivot.quantity || 1))
+      )
+    );
+
+    const updated = items.map((i) => {
+      const best = applicable.reduce((b, off) => {
+        if (off.products.some((p) => p.id === i.id)) {
+          return Math.max(b, off.discount);
+        }
+        return b;
+      }, 0);
+      const price = +(i.basePrice * (1 - best / 100)).toFixed(2);
+      return { ...i, price, subtotal: +(price * i.quantity).toFixed(2) };
+    });
+
+    // only update if something changed
+    const unchanged = updated.every((u, idx) =>
+      u.price === items[idx].price && u.subtotal === items[idx].subtotal
+    );
+    if (!unchanged) {
+      setItems(updated);
+    }
+  }, [items, offers]);
 
   const removeItem = (id: number) => {
     setItems(items.filter((i) => i.id !== id));
@@ -154,12 +202,18 @@ export default function Create() {
   const subtotal = items.reduce((sum, i) => sum + i.quantity * Number(i.price), 0);
   let discountAmount = 0;
   let total = subtotal;
-  if (offer) {
-    // infer original total by undoing discount on each unit price
-    const originalTotal = items.reduce(
-      (sum, i) => sum + i.quantity * (Number(i.price) / (1 - offer.discount / 100)),
-      0
-    );
+  if (applicableOffers.length > 0) {
+    // compute discount by comparing with original price of items considering best offer per item
+    const originalTotal = items.reduce((sum, i) => {
+      const best = applicableOffers.reduce((b, off) => {
+        if (off.products.some(p => p.id === i.id)) {
+          return Math.max(b, off.discount);
+        }
+        return b;
+      }, 0);
+      const origPrice = best > 0 ? Number(i.price) / (1 - best / 100) : Number(i.price);
+      return sum + i.quantity * origPrice;
+    }, 0);
     discountAmount = +(originalTotal - subtotal).toFixed(2);
     total = +(subtotal).toFixed(2);
   }
@@ -182,8 +236,6 @@ export default function Create() {
           })),
           customer_name,
           total,
-          offer_id: offer?.id,
-          discount: discountAmount,
         },
         {
           preserveScroll: true,
@@ -347,7 +399,9 @@ export default function Create() {
                   <td className="p-2">{item.name}</td>
                   <td className="p-2 text-center">
                 ${item.price}
-                {offer && <span className="text-xs text-gray-500 block">({(item.price / (1 - offer.discount/100)).toFixed(2)})</span>}
+                {applicableOffers.some(off => off.products.some(p=>p.id===item.id)) && (
+                  <span className="text-xs text-gray-500 block">(original: ${item.basePrice})</span>
+                )}
               </td>
                   <td className="p-2 text-center">{item.stock}</td>
                   <td className="p-2 text-center">
@@ -382,9 +436,9 @@ export default function Create() {
 
         {/* Total */}
         <div className="flex flex-col items-end mb-2">
-          {offer && (
+          {applicableOffers.length > 0 && (
             <span className="text-sm text-gray-600">
-              Aplicando oferta "{offer.name}" ({offer.discount}%): -${discountAmount}
+              Aplicando oferta(s) {applicableOffers.map(o => `"${o.name}"`).join(', ')}: -${discountAmount}
             </span>
           )}
           <span className="text-xl font-semibold">Total: ${total}</span>

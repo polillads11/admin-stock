@@ -20,6 +20,11 @@ class OfferRequest extends FormRequest
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'active' => 'boolean',
+
+            // products for this offer (array of objects with id and optional quantity)
+            'products' => 'nullable|array',
+            'products.*.id' => 'required|exists:products,id',
+            'products.*.quantity' => 'nullable|integer|min:1',
         ];
     }
 }

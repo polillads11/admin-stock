@@ -12,6 +12,7 @@ interface Offer {
   start_date?: string;
   end_date?: string;
   active: boolean;
+  products_count?: number;
 }
 
 export default function Index({ offers }: { offers: { data: Offer[] } }) {
@@ -56,6 +57,7 @@ export default function Index({ offers }: { offers: { data: Offer[] } }) {
           <tr className="bg-gray-100">
             <th className="p-2 text-left border">Nombre</th>
             <th className="p-2 text-left border">Descuento</th>
+            <th className="p-2 text-left border">Productos</th>
             <th className="p-2 text-left border">Inicio</th>
             <th className="p-2 text-left border">Fin</th>
             <th className="p-2 border">Acciones</th>
@@ -66,6 +68,7 @@ export default function Index({ offers }: { offers: { data: Offer[] } }) {
             <tr key={offer.id}>
               <td className="p-2 border">{offer.name}</td>
               <td className="p-2 border">{offer.discount}%</td>
+              <td className="p-2 border">{offer.products_count || 0}</td>
               <td className="p-2 border">{offer.start_date || '-'}</td>
               <td className="p-2 border">{offer.end_date || '-'}</td>
               <td className="p-2 border text-center">

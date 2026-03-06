@@ -40,4 +40,14 @@ class Offer extends Model
                          });
                      });
     }
+
+    /**
+     * Products associated with the offer (for product-specific discounts or combos).
+     */
+    public function products()
+    {
+        return $this->belongsToMany(Product::class)
+                    ->withPivot('quantity')
+                    ->withTimestamps();
+    }
 }
