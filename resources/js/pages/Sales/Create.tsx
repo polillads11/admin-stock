@@ -26,6 +26,11 @@ interface PageProps extends Record<string, any> {
   flash: {
     success?: string;
   };
+  offer?: {
+    id: number;
+    name: string;
+    discount: number;
+  } | null;
 }
 
 interface Local {
@@ -42,6 +47,7 @@ export default function Create() {
   const { props } = usePage<PageProps>();
   const locals = props.locals || [];
   const flash = props.flash || {};
+  const offer = props.offer || null;
 
   const [localId, setLocalId] = useState<string>("");
   const [search, setSearch] = useState("");
@@ -108,7 +114,8 @@ export default function Create() {
   }, [search, localId]);
 
   const addItem = (product: Product) => {
-    const price = Number(product.price);
+    const basePrice = Number(product.price);
+    const price = offer ? +(basePrice * (1 - offer.discount / 100)).toFixed(2) : basePrice;
 
     setItems((prevItems) => {
       const exists = prevItems.find((i) => i.id === product.id);
@@ -116,11 +123,11 @@ export default function Create() {
       if (exists) {
         return prevItems.map((i) =>
           i.id === product.id
-            ? { ...i, quantity: i.quantity + 1, subtotal: (i.quantity + 1) * price }
+            ? { ...i, quantity: i.quantity + 1, subtotal: +( (i.quantity + 1) * price ).toFixed(2) }
             : i
         );
       } else {
-        return [...prevItems, { ...product, quantity: 1, subtotal: price }];
+        return [...prevItems, { ...product, quantity: 1, subtotal: price, price } as SaleItem];
       }
     });
   };
@@ -128,7 +135,7 @@ export default function Create() {
 
   const updateQuantity = (id: number, quantity: number) => {
     const updated = items.map((i) =>
-      i.id === id ? { ...i, quantity, subtotal: quantity * Number(i.price) } : i
+      i.id === id ? { ...i, quantity, subtotal: +(quantity * Number(i.price)).toFixed(2) } : i
     );
     setItems(updated);
   };
@@ -143,7 +150,19 @@ export default function Create() {
     inputRef.current?.focus();
   }, []);
 
-  const total = items.reduce((sum, i) => sum + i.quantity * Number(i.price), 0);
+  // subtotal already uses discounted unit prices when an offer is active
+  const subtotal = items.reduce((sum, i) => sum + i.quantity * Number(i.price), 0);
+  let discountAmount = 0;
+  let total = subtotal;
+  if (offer) {
+    // infer original total by undoing discount on each unit price
+    const originalTotal = items.reduce(
+      (sum, i) => sum + i.quantity * (Number(i.price) / (1 - offer.discount / 100)),
+      0
+    );
+    discountAmount = +(originalTotal - subtotal).toFixed(2);
+    total = +(subtotal).toFixed(2);
+  }
 
   const handleSubmit = async () => {
     if (!localId) return alert("Selecciona un local.");
@@ -163,6 +182,8 @@ export default function Create() {
           })),
           customer_name,
           total,
+          offer_id: offer?.id,
+          discount: discountAmount,
         },
         {
           preserveScroll: true,
@@ -324,7 +345,10 @@ export default function Create() {
               {items.map((item) => (
                 <tr key={item.id} className="border-t">
                   <td className="p-2">{item.name}</td>
-                  <td className="p-2 text-center">${item.price}</td>
+                  <td className="p-2 text-center">
+                ${item.price}
+                {offer && <span className="text-xs text-gray-500 block">({(item.price / (1 - offer.discount/100)).toFixed(2)})</span>}
+              </td>
                   <td className="p-2 text-center">{item.stock}</td>
                   <td className="p-2 text-center">
                     <input
@@ -357,8 +381,15 @@ export default function Create() {
         )}
 
         {/* Total */}
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col items-end mb-2">
+          {offer && (
+            <span className="text-sm text-gray-600">
+              Aplicando oferta "{offer.name}" ({offer.discount}%): -${discountAmount}
+            </span>
+          )}
           <span className="text-xl font-semibold">Total: ${total}</span>
+        </div>
+        <div className="flex justify-between items-center">
           <button
             disabled={loading}
             onClick={handleSubmit}

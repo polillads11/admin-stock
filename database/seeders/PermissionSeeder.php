@@ -39,6 +39,10 @@ class PermissionSeeder extends Seeder
             'local.create',
             'local.edit',
             'local.delete',
+            'offers.view',
+            'offers.create',
+            'offers.edit',
+            'offers.delete',
             'permissions.view',
             'permissions.assign',
         ];

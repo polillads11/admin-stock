@@ -7,6 +7,7 @@ use App\Models\SaleItem;
 use App\Models\Product;
 use App\Models\StockMovement;
 use App\Models\ProductLocalStock;
+use App\Models\Offer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -41,9 +42,13 @@ class SaleController extends Controller
         $locals = Local::all(['id', 'name']); // 👈 enviamos lista de locales al frontend
         $products = Product::all(['id', 'name', 'price', 'stock']);
 
+        // determinar oferta activa más alta
+        $offer = Offer::active()->orderByDesc('discount')->first();
+
         return Inertia::render('Sales/Create', [
             'locals' => $locals,
             'products' => $products,
+            'offer' => $offer,
         ]);
     }
 
@@ -55,25 +60,24 @@ class SaleController extends Controller
             'products' => 'required|array|min:1',
             'products.*.id' => 'required|exists:products,id',
             'products.*.quantity' => 'required|integer|min:1',
-            'total' => 'required|numeric|min:0',
+            'offer_id' => 'nullable|exists:offers,id',
+            'discount' => 'nullable|numeric|min:0',
         ]);
 
         DB::transaction(function () use ($validated) {
+            $offer = null;
+            if (!empty($validated['offer_id'])) {
+                $offer = Offer::active()->find($validated['offer_id']);
+            }
 
-            $sale = Sale::create([
-                'user_id' => auth()->id(),
-                'local_id' => $validated['local_id'],
-                'customer_name' => $validated['customer_name'] ?? null,
-                'total' => $validated['total'],
-                'status' => 'completed',
-            ]);
+            // preparar items y calcular subtotal total, aplicando descuento por producto si hay oferta
+            $total = 0;
+            $preparedItems = [];
 
             foreach ($validated['products'] as $p) {
-
                 $product = Product::findOrFail($p['id']);
                 $quantity = $p['quantity'];
 
-                // 🔒 Obtener registro de stock por producto + local
                 $productLocalStock = ProductLocalStock::where('product_id', $product->id)
                     ->where('local_id', $validated['local_id'])
                     ->lockForUpdate()
@@ -87,24 +91,56 @@ class SaleController extends Controller
                     throw new \Exception("Stock insuficiente para {$product->name}.");
                 }
 
-                $subtotal = $product->price * $quantity;
+                $pricePerUnit = $product->price;
+                if ($offer) {
+                    $pricePerUnit = round($pricePerUnit * (1 - $offer->discount / 100), 2);
+                }
 
-                // ✅ Crear item de venta
+                $subtotal = $pricePerUnit * $quantity;
+                $total += $subtotal;
+
+                $preparedItems[] = compact('product', 'quantity', 'subtotal', 'pricePerUnit', 'productLocalStock');
+            }
+
+            $discountAmount = 0;
+            if ($offer) {
+                // descuento total = diferencia entre suma original y suma con precio descontado
+                $originalTotal = array_sum(array_map(fn($it) => $it['product']->price * $it['quantity'], $preparedItems));
+                $discountAmount = round($originalTotal - $total, 2);
+            }
+            $finalTotal = $total;
+
+            $sale = Sale::create([
+                'user_id' => auth()->id(),
+                'local_id' => $validated['local_id'],
+                'customer_name' => $validated['customer_name'] ?? null,
+                'total' => $finalTotal,
+                'status' => 'completed',
+                'offer_id' => $offer?->id,
+                'discount' => $discountAmount,
+            ]);
+
+            foreach ($preparedItems as $item) {
+                /** @var Product $product */
+                $product = $item['product'];
+                $quantity = $item['quantity'];
+                $subtotal = $item['subtotal'];
+                $pricePerUnit = $item['pricePerUnit'];
+                $stockRecord = $item['productLocalStock'];
+
                 SaleItem::create([
                     'sale_id' => $sale->id,
                     'product_id' => $product->id,
                     'quantity' => $quantity,
-                    'price' => $product->price,
+                    'price' => $pricePerUnit,
                     'subtotal' => $subtotal,
                 ]);
 
-                // ✅ Descontar stock
-                $productLocalStock->stock -= $quantity;
-                $productLocalStock->save();
+                $stockRecord->stock -= $quantity;
+                $stockRecord->save();
 
-                // ✅ Registrar movimiento
                 StockMovement::create([
-                    'product_local_stock_id' => $productLocalStock->id,
+                    'product_local_stock_id' => $stockRecord->id,
                     'quantity' => -$quantity,
                     'type' => 'sale',
                     'reference_type' => 'sale',
@@ -116,13 +152,11 @@ class SaleController extends Controller
         });
 
         return redirect()->back()->with('success', 'Venta registrada correctamente.');
-    }
-
-        
+    }       
 
     public function show(Sale $sale)
     {
-        $sale->load(['items.product', 'user', 'local']);
+        $sale->load(['items.product', 'user', 'local', 'offer']);
         return Inertia::render('Sales/Show', compact('sale'));
     }
     

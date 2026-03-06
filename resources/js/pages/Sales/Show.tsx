@@ -84,12 +84,31 @@ export default function Show() {
             <tr key={i.id} className="border-t">
               <td className="p-2">{i.product.name}</td>
               <td className="p-2">{i.quantity}</td>
-              <td className="p-2">${i.price}</td>
+              <td className="p-2">
+                ${i.price}
+                {sale.offer && (
+                  <span className="text-xs text-gray-500 block">
+                    ({(i.price / (1 - sale.offer.discount/100)).toFixed(2)})
+                  </span>
+                )}
+              </td>
               <td className="p-2">${i.subtotal}</td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      {sale.offer && (
+        <div className="text-right mt-2">
+          <span className="text-sm text-gray-600">
+            Oferta aplicada: {sale.offer.name} ({sale.offer.discount}% )
+          </span>
+          <br />
+          <span className="text-sm text-gray-600">
+            Descuento: ${sale.discount}
+          </span>
+        </div>
+      )}
 
       <div className="text-right text-xl font-bold mt-4">
         Total: ${sale.total}

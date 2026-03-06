@@ -59,6 +59,11 @@ const mainNavItems: NavItem[] = [
         href: '/locals',
         icon: House,
     },
+    {
+        title: 'Ofertas',
+        href: '/offers',
+        icon: House,
+    },
 ];
 
 const footerNavItems: NavItem[] = [

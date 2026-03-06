@@ -11,6 +11,7 @@ use App\Http\Controllers\StockMovementController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\LocalController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\OfferController;
 
 Route::get('/', function () {
     return Inertia::render('welcome', [
@@ -147,6 +148,32 @@ Route::middleware(['auth', 'verified'])->group(function () {
                     ->only(["edit", "update"])
                     ->middleware("permission:roles.edit");
 
+    Route::resource('roles', RoleController::class)
+                    ->only(["destroy"])
+                    ->middleware("permission:roles.delete");
+        
+    Route::resource('roles', RoleController::class)
+                    ->only(["index", "show"])
+                    ->middleware("permission:roles.view|roles.create|roles.edit|roles.delete");
+
+    //Offers routes
+    Route::resource('offers', OfferController::class)
+                    ->only(['create', 'store'])
+                    ->middleware("permission:offers.create");
+
+    Route::resource('offers', OfferController::class)
+                    ->only(["edit", "update"])
+                    ->middleware("permission:offers.edit");
+
+    Route::resource('offers', OfferController::class)
+                    ->only([ "destroy" ])
+                    ->middleware("permission:offers.delete");
+        
+    Route::resource('offers', OfferController::class)
+                    ->only(["index", "show"])
+                    ->middleware("permission:offers.view|offers.create|offers.edit|offers.delete");
+
+    //Roles routes
     Route::resource('roles', RoleController::class)
                     ->only(["destroy"])
                     ->middleware("permission:roles.delete");
