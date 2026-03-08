@@ -93,9 +93,11 @@ export default function Create() {
       if (product) {
         addItem(product);
       } else {
+        console.log("1: ", code);
         alert("Producto no encontrado");
       }
     } catch (error) {
+      console.log("2: ", code);
       alert("Producto no encontrado");
     }
     setShowScanner(false); 

@@ -32,6 +32,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/products/search', [ProductController::class, 'search'])->name('api.products.search');
 
+    Route::get('/products/byBarcode', [ProductController::class, 'byBarcode'])->name('api.products.byBarcode');
+
     Route::resource('products', ProductController::class)
                     ->only(["create", "store"])
                     ->middleware("permission:products.create");

@@ -41,7 +41,9 @@ const BarcodeScannerModal: React.FC<Props> = ({
           (result, err) => {
             if (result) {
               playBeep(); // 🔊 beep al detectar
-              onDetected(result.getText());
+              const barcodeValue = result.getText();
+              console.log("Código de barra detectado:", barcodeValue);              
+              onDetected(barcodeValue);
               handleClose();
             }
           }

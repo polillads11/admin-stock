@@ -183,4 +183,32 @@ class ProductController extends Controller
             'product' => $product,
         ]);
     }
+
+    public function byBarcode(Request $request)
+    {
+        $barcode = $request->input('barcode');
+        $localId = $request->input('local_id');
+
+        if (!$barcode || !$localId) {
+            return response()->json(['error' => 'Código de barra y local son requeridos'], 400);
+        }
+
+        $productStock = ProductLocalStock::with('product')
+            ->where('local_id', $localId)
+            ->whereHas('product', function ($q) use ($barcode) {
+                $q->where('sku', $barcode);
+            })
+            ->first();
+
+        if (!$productStock) {
+            return response()->json(['error' => 'Producto no encontrado'], 404);
+        }
+
+        return response()->json([
+            'id' => $productStock->product->id,
+            'name' => $productStock->product->name,
+            'price' => $productStock->product->price,
+            'stock' => $productStock->stock,
+        ]);
+    }
 }
