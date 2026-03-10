@@ -58,6 +58,8 @@ export default function Create() {
   const [results, setResults] = useState<Product[]>([]);
   const [items, setItems] = useState<SaleItem[]>([]);
   const [loading, setLoading] = useState(false);
+  // ref used to synchronously block repeated submissions (state updates are async)
+  const [submittingRef, setSubmittingRef] = useState(false);
   const [customer_name, setCustomerName] = useState("");
 
   // Modal
@@ -221,11 +223,15 @@ export default function Create() {
   }
 
   const handleSubmit = async () => {
+    // guard against double submission: do nothing if already processing
+    if (loading || submittingRef) return;
+
     if (!localId) return alert("Selecciona un local.");
     if (items.length === 0) return alert("Agrega al menos un producto.");
     if (items.some((item) => item.quantity > item.stock))
       return alert("La cantidad supera el stock disponible.");
 
+    setSubmittingRef(true);
     setLoading(true);
     try {
       await router.post(
@@ -251,7 +257,7 @@ export default function Create() {
     } catch (e) {
       console.error(e);
     } finally {
-      setLoading(false);
+      setSubmittingRef(false);
     }
   };
 
@@ -550,3 +556,4 @@ export default function Create() {
     </AppLayout>
   );
 }
+
