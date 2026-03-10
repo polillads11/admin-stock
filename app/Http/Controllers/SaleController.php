@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\StockMovement;
 use App\Models\ProductLocalStock;
 use App\Models\Offer;
+use App\Models\CashMovement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -205,6 +206,8 @@ class SaleController extends Controller
             ->when($startDate, fn($q) => $q->whereDate('sales.created_at', '>=', $startDate))
             ->when($endDate, fn($q) => $q->whereDate('sales.created_at', '<=', $endDate));
 
+
+
         // Ventas totales por local
         $salesByLocal = $sales->clone()
             ->selectRaw('locals.name as local, SUM(sales.total) as total')
@@ -219,6 +222,23 @@ class SaleController extends Controller
         // Ventas totales
         $amountSales = $sales->clone()
             ->count('sales.id');
+
+        // ==== caja: ingresos y egresos ====
+        $cashQuery = \App\Models\CashMovement::query()
+            ->when($userId && $userId !== 'none', fn($q) => $q->where('user_id', $userId))
+            ->when($startDate, fn($q) => $q->whereDate('created_at', ">=", $startDate))
+            ->when($endDate, fn($q) => $q->whereDate('created_at', "<=", $endDate));
+
+        $totalIncomes = $cashQuery->clone()
+            ->where('type', 'ingreso')
+            ->sum('amount');
+
+        $totalExpenses = $cashQuery->clone()
+            ->where('type', 'egreso')
+            ->sum('amount');
+
+        // ganancia neta: ventas + ingresos - egresos
+        $netCash = $totalSales + $totalIncomes - $totalExpenses;
 
         // Ventas por día (últimos 30 días)
         $salesByDate = $sales->clone()
@@ -249,6 +269,10 @@ class SaleController extends Controller
             'salesByDate' => $salesByDate,
             'topProducts' => $topProducts,
             'users' => $users,
+            // caja stats
+            'totalIncomes' => $totalIncomes,
+            'totalExpenses' => $totalExpenses,
+            'netCash' => $netCash,
             'filters' => [
                 'user_id' => $userId,
                 'start_date' => $startDate,

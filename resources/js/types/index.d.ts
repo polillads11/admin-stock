@@ -19,8 +19,7 @@ export interface NavItem {
     title: string;
     href: NonNullable<InertiaLinkProps['href']>;
     icon?: LucideIcon | null;
-    isActive?: boolean;
-}
+    isActive?: boolean;    permission?: string; // optional permission required to see this item}
 
 export interface SharedData {
     name: string;

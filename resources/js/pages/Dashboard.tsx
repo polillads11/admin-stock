@@ -13,7 +13,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Dashboard() {
-  const { totalSales, amountSales, salesByLocal, salesByDate, topProducts, users, filters } = usePage().props as unknown as {
+  const { totalSales, amountSales, salesByLocal, salesByDate, topProducts, users, filters, totalIncomes, totalExpenses, netCash } = usePage().props as unknown as {
     totalSales: number;
     amountSales: number;
     salesByLocal: Array<{ local: string; total: number }>;
@@ -21,6 +21,10 @@ export default function Dashboard() {
     // include both keys that might be returned for product counts
     topProducts: Array<{ name: string; quantity?: number; total_sold?: number }>;
     users: Array<{ id: number; name: string }>;
+    // caja
+    totalIncomes: number;
+    totalExpenses: number;
+    netCash: number;
     filters?: { user_id?: string; start_date?: string; end_date?: string };
   };
 
@@ -80,7 +84,7 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <div className="grid auto-rows-min gap-4 md:grid-cols-3">
+        <div className="grid auto-rows-min gap-4 md:grid-cols-4">
         
           <Card>
             <CardContent className="p-4 mb-4">
@@ -99,6 +103,33 @@ export default function Dashboard() {
                     </h2>
                   </div>
                 </div>              
+            </CardContent>
+          </Card>
+
+          {/* 💰 Estadística de caja */}
+          <Card>
+            <CardContent className="p-4 mb-4">
+              <h2 className="text-lg font-semibold mb-4">Caja</h2>
+              <div className="flex flex-col justify-between w-full h-full">
+                <div>
+                  <p className="p-1 text-green-500 underline">Ingresos:</p>
+                  <h2 className="text-center text-3xl font-bold text-blue-600 w-full">
+                    $ {totalIncomes.toLocaleString()}
+                  </h2>
+                </div>
+                <div>
+                  <p className="p-1 text-red-500 underline">Egresos:</p>
+                  <h2 className="text-center text-3xl font-bold text-blue-600 w-full">
+                    $ {totalExpenses.toLocaleString()}
+                  </h2>
+                </div>
+                <div>
+                  <p className="p-1 text-green-500 underline">Ganancia neta:</p>
+                  <h2 className="text-center text-5xl font-bold text-blue-600 w-full">
+                    $ {netCash.toLocaleString()}
+                  </h2>
+                </div>
+              </div>
             </CardContent>
           </Card>
 

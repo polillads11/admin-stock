@@ -12,13 +12,12 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid, UsersRound, Workflow, 
-    LayoutList, ShoppingCart, List, House, MonitorOff, TicketPercent } from 'lucide-react';
+    LayoutList, ShoppingCart, List, House, MonitorOff, TicketPercent, DollarSign } from 'lucide-react';
 import AppLogo from './app-logo';
-import { can } from '@/lib/can';
 
-const mainNavItems: NavItem[] = [
+const rawNavItems: Array<NavItem & { permission?: string }> = [
     {
         title: 'Panel',
         href: dashboard(),
@@ -64,7 +63,17 @@ const mainNavItems: NavItem[] = [
         href: '/offers',
         icon: TicketPercent,
     },
+    {
+        title: 'Caja',
+        href: '/cash-movements',
+        icon: DollarSign,
+        permission: 'cash.view',
+    },
 ];
+
+// the list will be filtered inside the component where hooks can be used
+// (avoids invalid hook call by running can() outside of a React component)
+
 
 const footerNavItems: NavItem[] = [
     {
@@ -75,6 +84,18 @@ const footerNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
+    // access page props inside component (hook allowed)
+    const { auth } = usePage().props as unknown as {
+        auth: { permissions: string[] };
+    };
+
+    const mainNavItems: NavItem[] = rawNavItems.filter((item) => {
+        if (item.permission) {
+            return auth.permissions.includes(item.permission as string);
+        }
+        return true;
+    });
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>

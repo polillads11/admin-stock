@@ -43,6 +43,10 @@ class PermissionSeeder extends Seeder
             'offers.create',
             'offers.edit',
             'offers.delete',
+            'cash.view',
+            'cash.create',
+            'cash.delete',
+            'cash.edit',
             'permissions.view',
             'permissions.assign',
         ];

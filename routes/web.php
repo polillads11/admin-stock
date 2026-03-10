@@ -12,6 +12,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\LocalController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\OfferController;
+use App\Http\Controllers\CashMovementController;
 
 Route::get('/', function () {
     return Inertia::render('welcome', [
@@ -88,6 +89,25 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     //Stock Movements routes
     Route::get('stock-movements', [StockMovementController::class, 'index'])->name('stock-movements.index');
+
+    //Cash (Caja) movements routes
+    Route::get('cash-movements', [CashMovementController::class, 'index'])
+        ->name('cash-movements.index');
+    Route::get('cash-movements/create', [CashMovementController::class, 'create'])
+        ->name('cash-movements.create')
+        ->middleware('permission:cash.create');
+    Route::post('cash-movements', [CashMovementController::class, 'store'])
+        ->name('cash-movements.store')
+        ->middleware('permission:cash.create');
+    Route::delete('cash-movements/{cashMovement}', [CashMovementController::class, 'destroy'])
+        ->name('cash-movements.destroy')
+        ->middleware('permission:cash.delete');
+    Route::get('cash-movements/{cashMovement}/edit', [CashMovementController::class, 'edit'])
+        ->name('cash-movements.edit')
+        ->middleware('permission:cash.edit');
+    Route::put('cash-movements/{cashMovement}', [CashMovementController::class, 'update'])
+        ->name('cash-movements.update')
+        ->middleware('permission:cash.edit');
 
     //Locals routes
     Route::resource('locals', \App\Http\Controllers\LocalController::class)
