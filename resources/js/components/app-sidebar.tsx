@@ -14,7 +14,7 @@ import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid, UsersRound, Workflow, 
-    LayoutList, ShoppingCart, List, House, MonitorOff} from 'lucide-react';
+    LayoutList, ShoppingCart, List, House, MonitorOff, TicketPercent } from 'lucide-react';
 import AppLogo from './app-logo';
 import { can } from '@/lib/can';
 
@@ -62,7 +62,7 @@ const mainNavItems: NavItem[] = [
     {
         title: 'Ofertas',
         href: '/offers',
-        icon: House,
+        icon: TicketPercent,
     },
 ];
 
