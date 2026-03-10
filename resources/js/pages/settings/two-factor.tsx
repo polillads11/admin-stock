@@ -19,7 +19,7 @@ interface TwoFactorProps {
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Two-Factor Authentication',
+        title: 'Doble factor de autenticación',
         href: show.url(),
     },
 ];
@@ -42,21 +42,20 @@ export default function TwoFactor({
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Two-Factor Authentication" />
+            <Head title="Doble factor de autenticación" />
             <SettingsLayout>
                 <div className="space-y-6">
                     <HeadingSmall
-                        title="Two-Factor Authentication"
-                        description="Manage your two-factor authentication settings"
+                        title="Doble factor de autenticación"
+                        description="Administrar su configuración de autenticación de doble factor para aumentar la seguridad de su cuenta."
                     />
                     {twoFactorEnabled ? (
                         <div className="flex flex-col items-start justify-start space-y-4">
-                            <Badge variant="default">Enabled</Badge>
+                            <Badge variant="active">Activado</Badge>
                             <p className="text-muted-foreground">
-                                With two-factor authentication enabled, you will
-                                be prompted for a secure, random pin during
-                                login, which you can retrieve from the
-                                TOTP-supported application on your phone.
+                                Con la autenticación de dos factores habilitada, se te solicitará 
+                                un PIN aleatorio y seguro al iniciar sesión, que puedes recuperar 
+                                desde la aplicación compatible con TOTP en tu teléfono.
                             </p>
 
                             <TwoFactorRecoveryCodes
@@ -73,7 +72,7 @@ export default function TwoFactor({
                                             type="submit"
                                             disabled={processing}
                                         >
-                                            <ShieldBan /> Disable 2FA
+                                            <ShieldBan /> Desactivar 2FA
                                         </Button>
                                     )}
                                 </Form>
@@ -81,12 +80,11 @@ export default function TwoFactor({
                         </div>
                     ) : (
                         <div className="flex flex-col items-start justify-start space-y-4">
-                            <Badge variant="destructive">Disabled</Badge>
+                            <Badge variant="destructive">Desactivado</Badge>
                             <p className="text-muted-foreground">
-                                When you enable two-factor authentication, you
-                                will be prompted for a secure pin during login.
-                                This pin can be retrieved from a TOTP-supported
-                                application on your phone.
+                                Al activar la autenticación de dos factores, se te solicitará un PIN 
+                                seguro al iniciar sesión. Puedes obtener este PIN desde una aplicación 
+                                compatible con TOTP en tu teléfono.
                             </p>
 
                             <div>
@@ -95,7 +93,7 @@ export default function TwoFactor({
                                         onClick={() => setShowSetupModal(true)}
                                     >
                                         <ShieldCheck />
-                                        Continue Setup
+                                        Continuar configuración
                                     </Button>
                                 ) : (
                                     <Form
@@ -110,7 +108,7 @@ export default function TwoFactor({
                                                 disabled={processing}
                                             >
                                                 <ShieldCheck />
-                                                Enable 2FA
+                                                Activar 2FA
                                             </Button>
                                         )}
                                     </Form>
