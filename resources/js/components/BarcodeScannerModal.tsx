@@ -14,56 +14,65 @@ const BarcodeScannerModal: React.FC<Props> = ({
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const codeReaderRef = useRef<BrowserMultiFormatReader | null>(null);
-  const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
 
-  // 🔊 Sonido beep
+  const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
+  const [selectedDeviceId, setSelectedDeviceId] = useState<string>("");
+
   const playBeep = () => {
-    const audio = new Audio("/beep.mp3"); // Colocar archivo en /public
+    const audio = new Audio("/beep.mp3");
     audio.play();
+  };
+
+  const startScanner = (deviceId: string) => {
+    if (!videoRef.current) return;
+
+    const codeReader = new BrowserMultiFormatReader();
+    codeReaderRef.current = codeReader;
+
+    codeReader.decodeFromVideoDevice(deviceId, videoRef.current, (result) => {
+      if (result) {
+        playBeep();
+        const barcodeValue = result.getText();
+
+        onDetected(barcodeValue);
+        handleClose();
+      }
+    });
   };
 
   useEffect(() => {
     if (!isOpen) return;
 
-    const codeReader = new BrowserMultiFormatReader();
-    codeReaderRef.current = codeReader;
+    navigator.mediaDevices.enumerateDevices().then((devices) => {
+      const videoDevices = devices.filter((d) => d.kind === "videoinput");
 
-    navigator.mediaDevices.enumerateDevices().then((videoInputDevices) => {
-      const videoDevices = videoInputDevices.filter(
-        (device) => device.kind === "videoinput"
-      );
       setDevices(videoDevices);
 
       if (videoDevices.length > 0) {
-        codeReader.decodeFromVideoDevice(
-          videoDevices[0].deviceId,
-          videoRef.current!,
-          (result, err) => {
-            if (result) {
-              playBeep(); // 🔊 beep al detectar
-              const barcodeValue = result.getText();
-              console.log("Código de barra detectado:", barcodeValue);              
-              onDetected(barcodeValue);
-              handleClose();
-            }
-          }
-        );
+        const defaultDevice = videoDevices[0].deviceId;
+        setSelectedDeviceId(defaultDevice);
+        startScanner(defaultDevice);
       }
     });
 
-    return () => {
-      if (videoRef.current?.srcObject) {
-        const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
-        tracks.forEach((track) => track.stop());
-      }
-    };
+    return () => stopScanner();
   }, [isOpen]);
 
-  const handleClose = () => {
+  const stopScanner = () => {
     if (videoRef.current?.srcObject) {
       const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
       tracks.forEach((track) => track.stop());
     }
+  };
+
+  const handleCameraChange = (deviceId: string) => {
+    stopScanner();
+    setSelectedDeviceId(deviceId);
+    startScanner(deviceId);
+  };
+
+  const handleClose = () => {
+    stopScanner();
     onClose();
   };
 
@@ -73,6 +82,21 @@ const BarcodeScannerModal: React.FC<Props> = ({
     <div style={overlayStyle}>
       <div style={modalStyle}>
         <h2>Escanear Código</h2>
+
+        {/* Selector de cámara */}
+        {devices.length > 1 && (
+          <select
+            value={selectedDeviceId}
+            onChange={(e) => handleCameraChange(e.target.value)}
+            style={{ marginBottom: 10, width: "100%" }}
+          >
+            {devices.map((device, index) => (
+              <option key={device.deviceId} value={device.deviceId}>
+                Cámara {index + 1}
+              </option>
+            ))}
+          </select>
+        )}
 
         <video
           ref={videoRef}
@@ -89,7 +113,6 @@ const BarcodeScannerModal: React.FC<Props> = ({
 
 export default BarcodeScannerModal;
 
-// 🎨 estilos simples
 const overlayStyle: React.CSSProperties = {
   position: "fixed",
   top: 0,
