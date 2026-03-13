@@ -3,6 +3,7 @@ import { Head, useForm, Link, usePage } from "@inertiajs/react";
 import { route } from 'ziggy-js';
 import AppLayout from "@/layouts/app-layout";
 import { type BreadcrumbItem } from '@/types';
+import BarcodeScannerModal from "../../components/BarcodeScannerModal";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -51,6 +52,12 @@ export default function Create({ categories, locals }: Props) {
     }
   }, [flash?.success]);
 
+  const [scannerOpen, setScannerOpen] = useState(false);
+
+  const handleBarcodeDetected = (code: string) => {
+    setData("sku", code);
+  };
+
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
     <div className="p-6 max-w-2xl mx-auto">
@@ -65,15 +72,27 @@ export default function Create({ categories, locals }: Props) {
       <h1 className="text-2xl font-bold mb-4">Nuevo Producto</h1>
 
       <form onSubmit={submit} className="space-y-4">
-        <div>
-          <label className="block font-semibold">SKU</label>
-          <input
-            className="border rounded w-full p-2"
-            value={data.sku}
-            onChange={(e) => setData("sku", e.target.value)}
-          />
-          {errors.sku && <p className="text-red-500">{errors.sku}</p>}
-        </div>
+          <div>
+            <label className="block font-semibold">SKU</label>
+
+            <div className="flex gap-2">
+              <input
+                className="border rounded w-full p-2"
+                value={data.sku}
+                onChange={(e) => setData("sku", e.target.value)}
+              />
+
+              <button
+                type="button"
+                onClick={() => setScannerOpen(true)}
+                className="bg-gray-800 text-white px-3 rounded"
+              >
+                📷
+              </button>
+            </div>
+
+            {errors.sku && <p className="text-red-500">{errors.sku}</p>}
+          </div>
 
         <div>
           <label className="block font-semibold">Nombre</label>
@@ -135,6 +154,11 @@ export default function Create({ categories, locals }: Props) {
         </div>
       </form>
     </div>
+      <BarcodeScannerModal
+        isOpen={scannerOpen}
+        onClose={() => setScannerOpen(false)}
+        onDetected={handleBarcodeDetected}
+      />
     </AppLayout>
   );
 }
