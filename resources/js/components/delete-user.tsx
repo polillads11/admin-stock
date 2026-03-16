@@ -44,13 +44,13 @@ export default function DeleteUser() {
                     </DialogTrigger>
                     <DialogContent>
                         <DialogTitle>
-                            Are you sure you want to delete your account?
+                            ¿Estás seguro de que quieres eliminar tu cuenta?
                         </DialogTitle>
                         <DialogDescription>
-                            Once your account is deleted, all of its resources
-                            and data will also be permanently deleted. Please
-                            enter your password to confirm you would like to
-                            permanently delete your account.
+                            Una vez eliminada tu cuenta, todos sus recursos
+                            y datos también se eliminarán permanentemente. Por favor,
+                            introduce tu contraseña para confirmar que deseas
+                            eliminar tu cuenta de forma permanente.
                         </DialogDescription>
 
                         <Form
@@ -69,7 +69,7 @@ export default function DeleteUser() {
                                             htmlFor="password"
                                             className="sr-only"
                                         >
-                                            Password
+                                            Contraseña
                                         </Label>
 
                                         <Input
@@ -77,7 +77,7 @@ export default function DeleteUser() {
                                             type="password"
                                             name="password"
                                             ref={passwordInput}
-                                            placeholder="Password"
+                                            placeholder="Contraseña"
                                             autoComplete="current-password"
                                         />
 
@@ -92,7 +92,7 @@ export default function DeleteUser() {
                                                     resetAndClearErrors()
                                                 }
                                             >
-                                                Cancel
+                                                Cancelar
                                             </Button>
                                         </DialogClose>
 
@@ -105,7 +105,7 @@ export default function DeleteUser() {
                                                 type="submit"
                                                 data-test="confirm-delete-user-button"
                                             >
-                                                Delete account
+                                                Eliminar cuenta
                                             </button>
                                         </Button>
                                     </DialogFooter>

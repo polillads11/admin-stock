@@ -29,7 +29,7 @@ export default function Welcome({ auth }: { auth: Auth }) {
                             href={route('dashboard')}
                             className="text-blue-600 hover:underline"
                         >
-                            Dashboard
+                            Panel
                         </Link>
                     ) : (
                         <>
