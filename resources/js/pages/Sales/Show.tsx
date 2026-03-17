@@ -30,6 +30,12 @@ interface Item {
   product: Product;
 }
 
+interface Offer {
+  id: number;
+  name: string;
+  discount: number;
+}
+
 interface Sale {
   id: number;
   customer_name: string | null;
@@ -39,6 +45,8 @@ interface Sale {
   items: Item[];
   user: { name: string };
   local: Local;
+  offer?: Offer;
+  discount?: number;
 }
 
 export default function Show() {
@@ -47,16 +55,17 @@ export default function Show() {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
     <div className="p-6 max-w-3xl mx-auto">
+      <Link
+          href={route("sales.index")}
+          className="text-gray-700"
+        >
+          ← Volver
+        </Link>
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">
           Venta #{sale.id} - {sale.customer_name || "Cliente genérico"}
         </h1>
-        <Link
-          href={route("sales.index")}
-          className="text-gray-700 underline"
-        >
-          ← Volver
-        </Link>
+        
       </div>
 
       <p>

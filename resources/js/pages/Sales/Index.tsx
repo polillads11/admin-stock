@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, router } from "@inertiajs/react";
+import { Head, Link, router } from "@inertiajs/react";
 import { route } from 'ziggy-js';
 import AppLayout from "@/layouts/app-layout";
 import { type BreadcrumbItem } from '@/types';
@@ -17,6 +17,12 @@ interface User {
   name: string;
 }
 
+interface Offer {
+  id: number;
+  name: string;
+  discount: number;
+}
+
 interface Sale {
   id: number;
   customer_name: string | null;
@@ -25,7 +31,7 @@ interface Sale {
   status: string;
   created_at: string;
   user: User;
-  offer?: { name: string };
+  offer?: Offer;
 }
 
 interface Props {
@@ -46,10 +52,11 @@ export default function Index({ sales, filters }: Props) {
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
+      <Head title="Ventas" />
     <div className="p-6">
       {/* Encabezado */}
        <Link
-                href={route("dashboard")}
+                href={route("sales.index")}
                 className="text-gray-700 underline"
               >
                 ← Volver

@@ -18,7 +18,7 @@ export default function Edit({ category }: { category: Category }) {
 
   const breadcrumbs: BreadcrumbItem[] = [
       {
-          title: 'Categories Edit',
+          title: 'Editar Categoría',
           href: '/categories',
       },
   ];
@@ -31,11 +31,12 @@ export default function Edit({ category }: { category: Category }) {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Editar Categoría" />
+      <div className="p-6 max-w-2xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">Editar Categoría</h1>
 
       <form onSubmit={handleSubmit} className="max-w-md space-y-4">
         <div>
-          <label className="block font-semibold">Nombre</label>
+          <label className="block font-semibold bg-gray-200 p-2">Nombre</label>
           <input
             type="text"
             value={data.name}
@@ -56,6 +57,7 @@ export default function Edit({ category }: { category: Category }) {
         </button>
         </div>
       </form>
+      </div>
     </AppLayout>
   );
 }

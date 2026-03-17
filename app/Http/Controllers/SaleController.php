@@ -21,12 +21,14 @@ class SaleController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search');
+        $offers = Offer::active()->with('products')->get();
 
         $sales = Sale::with('user')
             ->when($search, fn($q) =>
                 $q->where('customer_name', 'like', "%{$search}%")
                 ->orWhere('id', $search)
             )
+            ->with('offer')
             ->orderByDesc('created_at')
             ->paginate(10)
             ->withQueryString();

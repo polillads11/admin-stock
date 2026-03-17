@@ -9,8 +9,8 @@ interface Offer {
   id: number;
   name: string;
   discount: number;
-  start_date?: string;
-  end_date?: string;
+  start_date: string;
+  end_date: string;
   active: boolean;
   products_count?: number;
 }
@@ -69,8 +69,8 @@ export default function Index({ offers }: { offers: { data: Offer[] } }) {
               <td className="p-2 border">{offer.name}</td>
               <td className="p-2 border">{offer.discount}%</td>
               <td className="p-2 border">{offer.products_count || 0}</td>
-              <td className="p-2 border">{offer.start_date || '-'}</td>
-              <td className="p-2 border">{offer.end_date || '-'}</td>
+              <td className="p-2 border">{new Date(offer.start_date).toLocaleDateString() || '-'}</td>
+              <td className="p-2 border">{new Date(offer.end_date).toLocaleDateString() || '-'}</td>
               <td className="p-2 border text-center">
                 <div className="inline-flex rounded-md shadow-sm overflow-hidden border border-gray-200">
                 {can('offers.edit') && (<Link

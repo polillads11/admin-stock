@@ -7,7 +7,7 @@ import BarcodeScannerModal from "../../components/BarcodeScannerModal";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Products Create',
+        title: 'Crear Producto',
         href: '/products',
     },
 ];
@@ -60,9 +60,9 @@ export default function Create({ categories, locals }: Props) {
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-    <div className="p-6 max-w-2xl mx-auto">
+    
       <Head title="Crear Producto" />
-      
+      <div className="p-6 max-w-2xl mx-auto">
       {showSuccess && (
           <div className="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
             {flash.success}
@@ -85,7 +85,7 @@ export default function Create({ categories, locals }: Props) {
               <button
                 type="button"
                 onClick={() => setScannerOpen(true)}
-                className="bg-gray-800 text-white px-3 rounded"
+                className="bg-green-600 text-white px-3 rounded"
               >
                 📷
               </button>
@@ -138,7 +138,8 @@ export default function Create({ categories, locals }: Props) {
               value={data.price}
               onChange={(e) => setData("price", e.target.value)}
             />
-          </div>
+            {errors.price && <p className="text-red-500">{errors.price}</p>}
+          </div>          
         </div>
 
         <div className="flex justify-between">

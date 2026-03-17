@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, usePage, router } from "@inertiajs/react";
+import { Link, usePage, router, Head } from "@inertiajs/react";
 import { route } from 'ziggy-js';
 import AppLayout from "@/layouts/app-layout";
 import { type BreadcrumbItem } from '@/types';
@@ -7,7 +7,7 @@ import { can } from '@/lib/can';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Products',
+        title: 'Productos',
         href: '/products',
     },
 ];
@@ -35,7 +35,7 @@ interface Props {
 }
 
 function handleDelete(id: number) {
-  if (confirm('Are you sure you want to delete this product?')) {
+  if (confirm('¿Estás seguro de que quieres eliminar este producto?')) {
     router.delete(route('products.destroy', id));
   }
 }
@@ -50,6 +50,7 @@ export default function Index({ products, filters }: Props) {
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
+      <Head title="Productos" />
       <div className="p-3">
         {can('products.create') && (
         <div className="flex justify-between items-center mb-4">

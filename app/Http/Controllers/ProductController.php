@@ -12,11 +12,6 @@ use Inertia\Inertia;
 
 class ProductController extends Controller
 {
-    /*public function __construct()
-    {
-        $this->middleware(['auth', 'permission:manage-products']);
-    }*/
-
     public function index(Request $request)
     {
         $products = Product::with(['category'])
@@ -47,13 +42,18 @@ class ProductController extends Controller
         $data = $request->validate([
             'sku' => 'required|string|unique:products,sku',
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'category_id' => 'nullable|exists:categories,id',
             'price' => 'required|numeric|min:0',
-
-            // nuevos
-            //'local_id' => 'required|exists:locals,id',
-            //'stock' => 'required|integer|min:0',
+            'description' => 'nullable|string',
+            'category_id' => 'nullable|exists:categories,id'
+            
+        ],
+        [
+            'sku.required' => 'El SKU es obligatorio.',
+            'sku.unique' => 'El SKU ya existe. Por favor, ingrese uno diferente.',
+            'name.required' => 'El nombre del producto es obligatorio.',
+            'price.required' => 'El precio es obligatorio.',
+            'price.numeric' => 'El precio debe ser un número.',
+            'price.min' => 'El precio no puede ser negativo.',
         ]);
 
         DB::transaction(function () use ($data) {
@@ -68,20 +68,6 @@ class ProductController extends Controller
                 ]);
             });
         });
-
-        /*$product = Product::create([
-            'sku' => $data['sku'],
-            'name' => $data['name'],
-            'description' => $data['description'] ?? null,
-            'category_id' => $data['category_id'] ?? null,
-            'price' => $data['price'],
-        ]);
-
-        ProductLocalStock::create([
-            'product_id' => $product->id,
-            'local_id' => $data['local_id'],
-            'stock' => $data['stock'],
-        ]);*/
 
         return redirect()->route('products.create')
             ->with('success', 'Producto creado correctamente.');
@@ -105,6 +91,14 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'category_id' => 'nullable|exists:categories,id',
             'price' => 'required|numeric|min:0'
+        ],
+        [
+            'sku.required' => 'El SKU es obligatorio.',
+            'sku.unique' => 'El SKU ya existe. Por favor, ingrese uno diferente.',
+            'name.required' => 'El nombre del producto es obligatorio.',
+            'price.required' => 'El precio es obligatorio.',
+            'price.numeric' => 'El precio debe ser un número.',
+            'price.min' => 'El precio no puede ser negativo.',
         ]);
 
         $product->update($data);

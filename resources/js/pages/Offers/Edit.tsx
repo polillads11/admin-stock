@@ -100,7 +100,7 @@ export default function Edit({ offer, products }: any) {
               <label className="block font-semibold">Inicio</label>
               <input
                 type="date"
-                value={data.start_date}
+                value={new Date(data.start_date).toISOString().split('T')[0]}
                 onChange={(e) => setData("start_date", e.target.value)}
                 className="w-full border rounded p-2"
               />
@@ -110,7 +110,7 @@ export default function Edit({ offer, products }: any) {
               <label className="block font-semibold">Fin</label>
               <input
                 type="date"
-                value={data.end_date}
+                value={new Date(data.end_date).toISOString().split('T')[0]}
                 onChange={(e) => setData("end_date", e.target.value)}
                 className="w-full border rounded p-2"
               />

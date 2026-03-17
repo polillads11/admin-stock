@@ -1,5 +1,5 @@
 import React from "react";
-import { Head, useForm } from "@inertiajs/react";
+import { Head, Link, useForm } from "@inertiajs/react";
 import AppLayout from "@/layouts/app-layout";
 import { route } from "ziggy-js";
 import { type BreadcrumbItem } from '@/types';
@@ -20,7 +20,7 @@ export default function Edit({ local }: { local: Local }) {
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
-      title: 'Locals Edit',
+      title: 'Editar Local',
       href: '/locals',
     }
   ];
@@ -32,13 +32,13 @@ export default function Edit({ local }: { local: Local }) {
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title="Editar Local" />
+      <div className="p-6 max-w-2xl mx-auto">
 
       <h1 className="text-2xl font-bold mb-4">Editar Local</h1>
 
       <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
         <div>
-          <label className="block font-semibold">Nombre</label>
+          <label className="block font-semibold bg-gray-200">Nombre</label>
           <input
             type="text"
             value={data.name}
@@ -49,7 +49,7 @@ export default function Edit({ local }: { local: Local }) {
         </div>
 
         <div>
-          <label className="block font-semibold">Dirección</label>
+          <label className="block font-semibold bg-gray-200">Dirección</label>
           <input
             type="text"
             value={data.address}
@@ -59,7 +59,7 @@ export default function Edit({ local }: { local: Local }) {
         </div>
 
         <div>
-          <label className="block font-semibold">Teléfono</label>
+          <label className="block font-semibold bg-gray-200">Teléfono</label>
           <input
             type="text"
             value={data.phone}
@@ -68,6 +68,10 @@ export default function Edit({ local }: { local: Local }) {
           />
         </div>
 
+        <div className="flex justify-between">
+          <Link href={route("categories.index")} className="text-gray-700">
+            ← Volver
+          </Link>
         <button
           type="submit"
           disabled={processing}
@@ -75,7 +79,9 @@ export default function Edit({ local }: { local: Local }) {
         >
           Actualizar
         </button>
+        </div>
       </form>
+      </div>
     </AppLayout>
   );
 }

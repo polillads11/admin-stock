@@ -1,9 +1,16 @@
 import React, { useState } from "react";
-import { Head, router } from "@inertiajs/react";
+import { Head, Link, router } from "@inertiajs/react";
 import AppLayout from "@/layouts/app-layout";
 import { route } from "ziggy-js";
+import { BreadcrumbItem } from "@/types";
 
 export default function Stock({ product }: { product: any }) {
+  const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Editar Stock',
+            href: '/products',
+        },
+    ];
   const [stocks, setStocks] = useState(
     product.local_stocks.reduce((acc: Record<number, number>, pls: any) => {
       acc[pls.id] = pls.stock;
@@ -20,13 +27,14 @@ export default function Stock({ product }: { product: any }) {
   };
 
   return (
-    <AppLayout>
-      <Head title={`Editar stock - ${product.name}`} />
-
+    <AppLayout breadcrumbs={breadcrumbs}>
+      <Head title={`Editar Stock – ${product.name}`} />
       <div className="p-6 max-w-2xl mx-auto">
         <h1 className="text-2xl font-bold mb-4">
           Editar stock – {product.name}
         </h1>
+
+        
 
         <form onSubmit={submit}>
           <table className="w-full border mb-4">
@@ -58,12 +66,17 @@ export default function Stock({ product }: { product: any }) {
             </tbody>
           </table>
 
-          <button
-            type="submit"
-            className="bg-blue-600 text-white px-4 py-2 rounded"
-          >
-            Guardar stock
-          </button>
+          <div className="flex justify-between">
+            <Link href={route("products.index")} className="text-gray-700">
+              ← Volver
+            </Link>
+            <button
+              type="submit"
+              className="bg-blue-600 text-white px-4 py-2 rounded"
+            >
+              Guardar stock
+            </button>            
+          </div>
         </form>
       </div>
     </AppLayout>
