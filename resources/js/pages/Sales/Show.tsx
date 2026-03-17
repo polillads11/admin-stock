@@ -79,7 +79,7 @@ export default function Show() {
         {new Date(sale.created_at).toLocaleString()}
       </p>
 
-      <table className="w-full border mt-4">
+      <table className="tabla-responsiva w-full border mt-4">
         <thead>
           <tr className="bg-gray-200">
             <th className="p-2 text-left">Producto</th>

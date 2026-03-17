@@ -26,14 +26,14 @@ export default function Show({
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title="Permissions Show" />
-
-      <div className="p-4 max-w-2xl mx-auto">
+      <Head title="Mostrar Permisos" />
+        <div className='m-6'>
+            <div className='p-6 max-w-2xl mx-auto bg-white rounded-lg shadow'>
         <Link
           href={route('permissions.index')}
-          className="cursor-pointer px-3 py-2 text-xs font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300"
+          className="text-gray-700"
         >
-          Volver
+          ← Volver
         </Link>
 
         <div className="mt-4 space-y-4">
@@ -88,6 +88,7 @@ export default function Show({
             )}
           </div>
         </div>
+      </div>
       </div>
     </AppLayout>
   );

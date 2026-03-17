@@ -31,6 +31,7 @@ export default function Index({ categories }: { categories: { data: Category[] }
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Categorías" />
 
+      <div className="m-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Categorías</h1>
         {can('categories.create') && (
@@ -48,7 +49,7 @@ export default function Index({ categories }: { categories: { data: Category[] }
         </div>
       )}
 
-      <table className="min-w-full border">
+      <table className="tabla-responsiva min-w-full border">
         <thead>
           <tr className="bg-gray-100">
             <th className="p-2 text-left border">Nombre</th>
@@ -81,6 +82,7 @@ export default function Index({ categories }: { categories: { data: Category[] }
           ))}
         </tbody>
       </table>
+      </div>
     </AppLayout>
   );
 }

@@ -156,7 +156,7 @@ export default function Edit({
               disabled={loading}
               className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:opacity-60"
             >
-              {loading ? "Guardando..." : "Guardar Cambios"}
+              {loading ? "Guardando..." : "Aceptar"}
             </button>
           </div>
         </form>

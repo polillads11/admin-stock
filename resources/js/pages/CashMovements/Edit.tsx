@@ -22,7 +22,7 @@ export default function Edit({ cashMovement }: { cashMovement: CashMovement }) {
 
   const breadcrumbs: BreadcrumbItem[] = [
       {
-          title: 'Cash Movements Edit',
+          title: 'Editar Movimiento de Caja',
           href: '/cash-movements',
       },
   ];
@@ -35,6 +35,7 @@ export default function Edit({ cashMovement }: { cashMovement: CashMovement }) {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Editar Movimiento de Caja" />
+      <div className="m-6 max-w-md mx-auto p-4 bg-white shadow">
       <h1 className="text-2xl font-bold mb-4">Editar Movimiento de Caja</h1>
 
       <form onSubmit={handleSubmit} className="max-w-md space-y-4">
@@ -90,6 +91,7 @@ export default function Edit({ cashMovement }: { cashMovement: CashMovement }) {
         </button>
         </div>
       </form>
+      </div>
     </AppLayout>
   );
 }

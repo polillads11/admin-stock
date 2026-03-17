@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import AppLayout from "@/layouts/app-layout";
-import { Head, usePage, router } from "@inertiajs/react";
+import { Head, usePage, router, Link } from "@inertiajs/react";
 import { route } from "ziggy-js";
 import { type BreadcrumbItem } from '@/types';
 
@@ -34,8 +34,11 @@ export default function Create() {
           {flash.success}
         </div>
       )}
-
-      <form onSubmit={submit} className="max-w-md mx-auto p-4 bg-white shadow">
+      
+      <form onSubmit={submit} className="m-6 max-w-md mx-auto p-4 bg-white shadow">
+        <Link href={route('cash-movements.index')} className="text-gray-700">
+        &larr; Volver
+      </Link>
         <div className="mb-4">
           <label className="block mb-1">Tipo</label>
           <select

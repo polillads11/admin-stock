@@ -1,5 +1,5 @@
 import React from "react";
-import { Head, router } from "@inertiajs/react";
+import { Head, Link, router } from "@inertiajs/react";
 import AppLayout from "@/layouts/app-layout";
 import { route } from "ziggy-js";
 import { type BreadcrumbItem } from '@/types';
@@ -53,18 +53,14 @@ export default function Show({ product }: { product: Product }) {
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={`Producto: ${product.name}`} />
 
-      <div className="max-w-3xl mx-auto bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-md">
+      <div className="m-6 max-w-3xl mx-auto bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-md">
+        <Link href={route('products.index')} className="text-gray-700">
+                    ← Volver
+                </Link>
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-semibold">
             Detalles del Producto
           </h1>
-
-          <button
-            onClick={() => router.visit(route("products.index"))}
-            className="px-4 py-2 rounded bg-gray-300 dark:bg-gray-700"
-          >
-            Volver
-          </button>
         </div>
 
         {/* Datos generales */}
@@ -108,27 +104,6 @@ export default function Show({ product }: { product: Product }) {
             ))}
           </tbody>
         </table>
-
-        {/* Botones */}
-        <div className="flex justify-end space-x-3 mt-6">
-          <button
-            onClick={() =>
-              router.visit(route("products.stock", product.id))
-            }
-            className="bg-indigo-600 text-white px-4 py-2 rounded"
-          >
-            Editar stock
-          </button>
-
-          <button
-            onClick={() =>
-              router.visit(route("products.edit", product.id))
-            }
-            className="bg-blue-600 text-white px-4 py-2 rounded"
-          >
-            Editar producto
-          </button>
-        </div>
       </div>
     </AppLayout>
   );

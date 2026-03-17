@@ -45,7 +45,7 @@ export default function Index({ users, filters }: IndexProps) {
 
         {/* Tabla */}
         <div className="overflow-x-auto rounded-lg border border-gray-200 shadow">
-          <table className="min-w-full divide-y divide-gray-200 bg-white">
+          <table className="tabla-responsiva min-w-full divide-y divide-gray-200 bg-white">
             <thead className="bg-gray-100">
               <tr>
                 <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">ID</th>

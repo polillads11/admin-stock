@@ -34,7 +34,7 @@ export default function Index({ offers }: { offers: { data: Offer[] } }) {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Ofertas" />
-
+      <div className="p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Ofertas</h1>
         {can('offers.create') && (
@@ -52,7 +52,7 @@ export default function Index({ offers }: { offers: { data: Offer[] } }) {
         </div>
       )}
 
-      <table className="min-w-full border">
+      <table className="tabla-responsiva min-w-full border">
         <thead>
           <tr className="bg-gray-100">
             <th className="p-2 text-left border">Nombre</th>
@@ -91,6 +91,7 @@ export default function Index({ offers }: { offers: { data: Offer[] } }) {
           ))}
         </tbody>
       </table>
+      </div>
     </AppLayout>
   );
 }

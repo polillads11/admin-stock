@@ -35,7 +35,7 @@ export default function Index({ movements }: { movements: { data: Movement[] } }
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Movimientos de caja" />
-
+      <div className="m-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Movimientos de caja</h1>
         {can('cash.create') && (
@@ -53,7 +53,7 @@ export default function Index({ movements }: { movements: { data: Movement[] } }
         </div>
       )}
 
-      <table className="min-w-full border">
+      <table className="tabla-responsiva min-w-full border">
         <thead>
           <tr className="bg-gray-100">
             <th className="p-2 border">Fecha</th>
@@ -93,6 +93,7 @@ export default function Index({ movements }: { movements: { data: Movement[] } }
           ))}
         </tbody>
       </table>
+      </div>
     </AppLayout>
   );
 }

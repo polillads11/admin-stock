@@ -68,7 +68,7 @@ export default function Edit({ role, rolePermissions, permissions }: EditProps) 
                             className='text-sm leading-none font-medium select-none peer-disabled:cursor-not-allowed peer-disabled:opacity-50'>
                             Permisos:
                         </label>
-                        <div className="flex gap-6">
+                        <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-4 p-4 border rounded-md bg-gray-50">
                             {permissionColumns.map((col, colIndex) => (
                                 <div key={colIndex} className="flex flex-col gap-2">
                                     {col.map((perm) => {

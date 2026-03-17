@@ -55,12 +55,7 @@ export default function Index({ sales, filters }: Props) {
       <Head title="Ventas" />
     <div className="p-6">
       {/* Encabezado */}
-       <Link
-                href={route("sales.index")}
-                className="text-gray-700 underline"
-              >
-                ← Volver
-              </Link>
+       
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Ventas</h1>
         {can('sales.create') && (<Link
@@ -86,7 +81,7 @@ export default function Index({ sales, filters }: Props) {
       </form>
 
       {/* Tabla de ventas */}
-      <table className="w-full border">
+      <table className="tabla-responsiva w-full border">
         <thead>
           <tr className="bg-gray-200 text-left">
             <th className="p-2">#</th>
@@ -103,7 +98,7 @@ export default function Index({ sales, filters }: Props) {
         <tbody>
           {sales.data.length > 0 ? (
             sales.data.map((sale) => (
-              <tr key={sale.id} className="border-t hover:bg-gray-50">
+              <tr key={sale.id} className="border-t hover:bg-gray-50 ">
                 <td className="p-2">{sale.id}</td>
                 <td className="p-2">
                   {sale.customer_name || "Cliente genérico"}

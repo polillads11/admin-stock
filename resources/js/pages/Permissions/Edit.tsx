@@ -54,11 +54,11 @@ export default function Edit({ user, usersPermissions, permissions, rolePermissi
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Editar Permisos" />
             <div className='p-3'>
-                <Link href={route('permissions.index')} className="cursor-pointer px-3 py-2 text-xs font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300">
-                    Volver
+                <Link href={route('permissions.index')} className="text-gray-700">
+                    ← Volver
                 </Link>
-                <form onSubmit={submit} className='space-y-6 mt-4 max-w-md mx-auto'>
-                    <div className='grid gap-2'>
+                <form onSubmit={submit} className='space-y-6 mt-4 mx-auto'>
+                    <div className='grid gap-2 max-w-md' >
                         <label htmlFor="name" className='text-sm leading-none font-medium select-none peer-disabled:cursor-not-allowed peer-disabled:opacity-50'>Nombre</label>
                         <input type="text"
                             id="name"
@@ -72,7 +72,7 @@ export default function Edit({ user, usersPermissions, permissions, rolePermissi
                     <div className="grid gap-2">
                         <label className="text-sm font-medium">Permisos:</label>
 
-                        <div className="flex gap-6">
+                        <div className='grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-4 p-4 border rounded-md bg-gray-50'>
                             {permissionColumns.map((col, colIndex) => (
                                 <div key={colIndex} className="flex flex-col gap-2">
                                     {col.map((perm) => {

@@ -12,7 +12,7 @@ export default function Create() {
     start_date: "",
     end_date: "",
     active: true,
-    products: [],
+    products: Array<{id:number, quantity:number}>(),
   });
 
   const { props } = usePage<any>();

@@ -76,7 +76,7 @@ export default function Index({ products, filters }: Props) {
           </button>
         </form>
 
-        <table className="w-full border">
+        <table className="tabla-responsiva w-full border">
           <thead>
             <tr className="bg-gray-200 text-left">
               <th className="p-2">SKU</th>
