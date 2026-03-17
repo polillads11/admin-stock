@@ -21,12 +21,14 @@ class SaleController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search');
-        $offers = Offer::active()->with('products')->get();
 
         $sales = Sale::with('user')
+            ->where('user_id', auth()->id()) // 👈 filtro por usuario logueado
             ->when($search, fn($q) =>
-                $q->where('customer_name', 'like', "%{$search}%")
-                ->orWhere('id', $search)
+                $q->where(function ($query) use ($search) {
+                    $query->where('customer_name', 'like', "%{$search}%")
+                        ->orWhere('id', $search);
+                })
             )
             ->with('offer')
             ->orderByDesc('created_at')
@@ -38,7 +40,6 @@ class SaleController extends Controller
             'filters' => ['search' => $search],
         ]);
     }
-
 
     public function create()
     {
