@@ -44,7 +44,8 @@ class SaleController extends Controller
     public function create()
     {
         $locals = Local::all(['id', 'name']); // 👈 enviamos lista de locales al frontend
-        $products = Product::all(['id', 'name', 'price', 'stock']);
+        $products = Product::with('localStocks')
+            ->get(['id', 'name', 'price']);
 
         // todas las ofertas activas con sus productos
         $offers = Offer::active()->with('products')->get();
