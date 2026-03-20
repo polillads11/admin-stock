@@ -19,7 +19,8 @@ class CreateNewUser implements CreatesNewUsers
      */
     public function create(array $input): User
     {
-        Validator::make($input, [
+         abort(403);
+        /*Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
             'email' => [
                 'required',
@@ -41,7 +42,7 @@ class CreateNewUser implements CreatesNewUsers
         $permissions = Permission::all();
         $user->syncPermissions($permissions);
 
-        return $user;
+        return $user;*/
     }
 
 }

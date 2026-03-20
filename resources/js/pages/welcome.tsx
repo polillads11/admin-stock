@@ -40,12 +40,12 @@ export default function Welcome({ auth }: { auth: Auth }) {
                                 Iniciar sesión
                             </Link>
 
-                            <Link
+                            {/*<Link
                                 href={route('register')}
                                 className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
                             >
                                 Registrarse
-                            </Link>
+                            </Link>*/}
                         </>
                     )}
                 </div>

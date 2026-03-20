@@ -97,7 +97,7 @@ export default function Login({
                                 Iniciar sesión
                             </Button>
                         </div>
-
+{/*
                         {canRegister && (
                             <div className="text-center text-sm text-muted-foreground">
                                 ¿No tenes una cuenta?{' '}
@@ -105,7 +105,7 @@ export default function Login({
                                     Registrate
                                 </TextLink>
                             </div>
-                        )}
+                        )}*/}
                     </>
                 )}
             </Form>
