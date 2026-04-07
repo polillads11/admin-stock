@@ -13,7 +13,7 @@ import {
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, UsersRound, Workflow, 
+import { BookOpen, Bell, Folder, LayoutGrid, UsersRound, Workflow, 
     LayoutList, ShoppingCart, List, House, MonitorOff, TicketPercent, DollarSign } from 'lucide-react';
 import AppLogo from './app-logo';
 
@@ -22,7 +22,12 @@ const rawNavItems: Array<NavItem & { permission?: string }> = [
         title: 'Panel',
         href: dashboard(),
         icon: LayoutGrid,
-    }, 
+    },
+    {
+        title: 'Notificaciones',
+        href: '/notifications',
+        icon: Bell,
+    },
     {
         title: 'Usuarios',
         href: '/users',

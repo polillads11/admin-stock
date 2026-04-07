@@ -9,10 +9,12 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\StockMovementController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ExampleNotificationController;
 use App\Http\Controllers\LocalController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\OfferController;
 use App\Http\Controllers\CashMovementController;
+use App\Http\Controllers\NotificationController;
 
 Route::get('/', function () {
     return Inertia::render('welcome', [
@@ -215,6 +217,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('products/{product}/stock', [\App\Http\Controllers\ProductStockController::class, 'update'])
         ->name('products.stock.update')
         ->middleware("permission:products.edit");
+
+    //Notifications routes
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/unread', [NotificationController::class, 'unread'])->name('notifications.unread');
+    Route::put('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
+    Route::put('/notifications/{notification}/unread', [NotificationController::class, 'markAsUnread'])->name('notifications.markAsUnread');
+    Route::put('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllRead');
+    Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
+    Route::delete('/notifications', [NotificationController::class, 'destroyAll'])->name('notifications.destroyAll');
+
+    // Example testing routes for notifications
+    Route::get('/example/notify-user/{userId}', [ExampleNotificationController::class, 'notifyUser']);
+    Route::get('/example/notify-maintenance', [ExampleNotificationController::class, 'notifyMaintenance']);
+    Route::get('/example/notify-product', [ExampleNotificationController::class, 'notifyProductCreated']);
+    Route::get('/example/notify-error', [ExampleNotificationController::class, 'notifyError']);
 });
 
 require __DIR__.'/settings.php';
