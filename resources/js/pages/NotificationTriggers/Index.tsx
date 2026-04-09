@@ -26,7 +26,7 @@ interface Props {
 export default function Index({ triggers }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: 'NotificacionesTriggers',
+            title: 'Notificaciones Programadas',
             href: '/notifications-triggers',
         },
       ];
@@ -91,15 +91,15 @@ export default function Index({ triggers }: Props) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
                     <div className="p-6">
-            <Head title="Triggers de Notificación" />
+            <Head title="Notificaciones Programadas" />
 
             <div className="container mx-auto px-4 py-8">
                 <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-3xl font-bold">Triggers de Notificación</h1>
+                    <h1 className="text-3xl font-bold">Listado de Notificaciones Programadas</h1>
                     <Link href={route('notification-triggers.create')}>
                         <Button>
                             <Plus className="w-4 h-4 mr-2" />
-                            Nuevo Trigger
+                            Nueva Notificación
                         </Button>
                     </Link>
                 </div>
@@ -130,7 +130,7 @@ export default function Index({ triggers }: Props) {
                                             variant="outline"
                                             size="sm"
                                             onClick={() => {
-                                                if (confirm('¿Eliminar este trigger?')) {
+                                                if (confirm('¿Eliminar esta notificación?')) {
                                                     // Handle delete
                                                 }
                                             }}

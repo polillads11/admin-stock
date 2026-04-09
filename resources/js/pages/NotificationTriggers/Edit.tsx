@@ -38,7 +38,7 @@ interface Props {
 export default function Edit({ trigger }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
             {
-                title: 'Editar NotificacionesTriggers',
+                title: 'Editar Notificaciones Programadas',
                 href: '/notifications-triggers.edit',
             },
           ];
@@ -92,13 +92,13 @@ export default function Edit({ trigger }: Props) {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>Configuración del Trigger</CardTitle>
+                        <CardTitle>Configuración de la Notificación</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <Label htmlFor="type">Tipo de Trigger</Label>
+                                    <Label htmlFor="type">Tipo de Notificación</Label>
                                     <Select value={data.type} onValueChange={(value) => setData('type', value)}>
                                         <SelectTrigger>
                                             <SelectValue placeholder="Seleccionar tipo" />
@@ -118,7 +118,13 @@ export default function Edit({ trigger }: Props) {
                                     <Label htmlFor="target_type">Destino</Label>
                                     <Select
                                         value={data.target_type}
-                                        onValueChange={(value) => setData('target_type', value)}
+                                        onValueChange={(value) =>
+                                            setData((prev) => ({
+                                                ...prev,
+                                                target_type: value,
+                                                target_id: value === 'user' || value === 'role' ? prev.target_id : null,
+                                            }))
+                                        }
                                     >
                                         <SelectTrigger>
                                             <SelectValue placeholder="Seleccionar destino" />
@@ -150,9 +156,9 @@ export default function Edit({ trigger }: Props) {
                             )}
 
                             <div>
-                                <Label htmlFor="conditions">Condiciones del Trigger</Label>
+                                <Label htmlFor="conditions">Condiciones</Label>
                                 <p className="text-sm text-slate-500 mb-2">
-                                    Elige los valores que activan este trigger. Los campos disponibles cambian según el tipo seleccionado.
+                                    Elige los valores que activan esta notificación. Los campos disponibles cambian según el tipo seleccionado.
                                 </p>
 
                                 {data.type === 'sales_goal' && (
@@ -165,12 +171,13 @@ export default function Edit({ trigger }: Props) {
                                                 value={data.conditions.sales_count ?? ''}
                                                 onChange={(e) => {
                                                     const salesCount = parseInt(e.target.value, 10);
-                                                    setData({
+                                                    setData((prev) => ({
+                                                        ...prev,
                                                         conditions: {
-                                                            ...data.conditions,
+                                                            ...prev.conditions,
                                                             sales_count: Number.isNaN(salesCount) ? undefined : salesCount,
                                                         },
-                                                    });
+                                                    }));
                                                 }}
                                                 placeholder="Número mínimo de ventas"
                                             />
@@ -180,12 +187,13 @@ export default function Edit({ trigger }: Props) {
                                             <Select
                                                 value={data.conditions.period || ''}
                                                 onValueChange={(value) =>
-                                                    setData({
+                                                    setData((prev) => ({
+                                                        ...prev,
                                                         conditions: {
-                                                            ...data.conditions,
+                                                            ...prev.conditions,
                                                             period: value,
                                                         },
-                                                    })
+                                                    }))
                                                 }
                                             >
                                                 <SelectTrigger>
@@ -209,12 +217,13 @@ export default function Edit({ trigger }: Props) {
                                                         type="date"
                                                         value={data.conditions.from_date ?? ''}
                                                         onChange={(e) =>
-                                                            setData({
+                                                            setData((prev) => ({
+                                                                ...prev,
                                                                 conditions: {
-                                                                    ...data.conditions,
+                                                                    ...prev.conditions,
                                                                     from_date: e.target.value,
                                                                 },
-                                                            })
+                                                            }))
                                                         }
                                                     />
                                                 </div>
@@ -225,12 +234,13 @@ export default function Edit({ trigger }: Props) {
                                                         type="date"
                                                         value={data.conditions.to_date ?? ''}
                                                         onChange={(e) =>
-                                                            setData({
+                                                            setData((prev) => ({
+                                                                ...prev,
                                                                 conditions: {
-                                                                    ...data.conditions,
+                                                                    ...prev.conditions,
                                                                     to_date: e.target.value,
                                                                 },
-                                                            })
+                                                            }))
                                                         }
                                                     />
                                                 </div>
@@ -248,12 +258,13 @@ export default function Edit({ trigger }: Props) {
                                             value={data.conditions.threshold ?? ''}
                                             onChange={(e) => {
                                                 const threshold = parseInt(e.target.value, 10);
-                                                setData({
+                                                setData((prev) => ({
+                                                    ...prev,
                                                     conditions: {
-                                                        ...data.conditions,
+                                                        ...prev.conditions,
                                                         threshold: Number.isNaN(threshold) ? undefined : threshold,
                                                     },
-                                                });
+                                                }));
                                             }}
                                             placeholder="Cantidad mínima de stock"
                                         />

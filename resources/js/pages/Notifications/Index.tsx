@@ -228,7 +228,7 @@ export default function NotificationsIndex() {
                                             href={route('notification-triggers.index')}
                                             className="rounded-md bg-green-600 px-3 py-2 text-sm font-medium text-white hover:bg-green-700"
                                         >
-                                            Gestionar Triggers
+                                            Programar notificación
                                         </Link>
                                     </div>
                                     <div className="flex items-center gap-2">

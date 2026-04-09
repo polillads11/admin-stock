@@ -9,6 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { ArrowLeft } from 'lucide-react';
 import { route } from "ziggy-js";
+import AppLayout from '@/layouts/app-layout';
+import { BreadcrumbItem } from '@/types';
 
 interface NotificationTriggerConditions {
     sales_count?: number;
@@ -31,6 +33,13 @@ interface NotificationTriggerForm {
 interface Props {}
 
 export default function Create({}: Props) {
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Crear Notificaciones Programadas',
+            href: '/notifications-triggers.create',
+        },
+    ];
+
     const { data, setData, post, processing, errors } = useForm<NotificationTriggerForm>({
         type: '',
         conditions: {},
@@ -59,8 +68,8 @@ export default function Create({}: Props) {
     ];
 
     return (
-        <>
-            <Head title="Crear Trigger de Notificación" />
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Crear Notificación Programada" />
 
             <div className="container mx-auto px-4 py-8">
                 <div className="flex items-center gap-4 mb-6">
@@ -68,36 +77,54 @@ export default function Create({}: Props) {
                         <ArrowLeft className="w-4 h-4 mr-2" />
                         Volver
                     </Button>
-                    <h1 className="text-3xl font-bold">Crear Trigger de Notificación</h1>
+                    
                 </div>
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>Configuración del Trigger</CardTitle>
+                        <CardTitle>Configuración de la Notificación</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <Label htmlFor="type">Tipo de Trigger</Label>
-                                    <Select value={data.type} onValueChange={(value) => setData('type', value)}>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Seleccionar tipo" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {typeOptions.map((option) => (
-                                                <SelectItem key={option.value} value={option.value}>
-                                                    {option.label}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                    <Label htmlFor="type">Tipo</Label>
+                                    <Select
+                                    value={data.type}
+                                    onValueChange={(value) =>
+                                        setData((prev) => ({
+                                            ...prev,
+                                            type: value,
+                                            conditions: {},
+                                        }))
+                                    }
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Seleccionar tipo" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {typeOptions.map((option) => (
+                                            <SelectItem key={option.value} value={option.value}>
+                                                {option.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                                     {errors.type && <p className="text-red-500 text-sm">{errors.type}</p>}
                                 </div>
 
                                 <div>
                                     <Label htmlFor="target_type">Destino</Label>
-                                    <Select value={data.target_type} onValueChange={(value) => setData('target_type', value)}>
+                                    <Select
+                                        value={data.target_type}
+                                        onValueChange={(value) =>
+                                            setData((prev) => ({
+                                                ...prev,
+                                                target_type: value,
+                                                target_id: value === 'user' || value === 'role' ? prev.target_id : null,
+                                            }))
+                                        }
+                                    >
                                         <SelectTrigger>
                                             <SelectValue placeholder="Seleccionar destino" />
                                         </SelectTrigger>
@@ -128,9 +155,9 @@ export default function Create({}: Props) {
                             )}
 
                             <div>
-                                <Label htmlFor="conditions">Condiciones del Trigger</Label>
+                                <Label htmlFor="conditions">Condiciones</Label>
                                 <p className="text-sm text-slate-500 mb-2">
-                                    Elige los valores que activan este trigger. Los campos disponibles cambian según el tipo seleccionado.
+                                    Elige los valores que activan esta notificación. Los campos disponibles cambian según el tipo seleccionado.
                                 </p>
 
                                 {data.type === 'sales_goal' && (
@@ -143,12 +170,13 @@ export default function Create({}: Props) {
                                                 value={data.conditions.sales_count ?? ''}
                                                 onChange={(e) => {
                                                     const salesCount = parseInt(e.target.value, 10);
-                                                    setData({
+                                                    setData((prev) => ({
+                                                        ...prev,
                                                         conditions: {
-                                                            ...data.conditions,
+                                                            ...prev.conditions,
                                                             sales_count: Number.isNaN(salesCount) ? undefined : salesCount,
                                                         },
-                                                    });
+                                                    }));
                                                 }}
                                                 placeholder="Número mínimo de ventas"
                                             />
@@ -158,12 +186,13 @@ export default function Create({}: Props) {
                                             <Select
                                                 value={data.conditions.period || ''}
                                                 onValueChange={(value) =>
-                                                    setData({
+                                                    setData((prev) => ({
+                                                        ...prev,
                                                         conditions: {
-                                                            ...data.conditions,
+                                                            ...prev.conditions,
                                                             period: value,
                                                         },
-                                                    })
+                                                    }))
                                                 }
                                             >
                                                 <SelectTrigger>
@@ -187,12 +216,13 @@ export default function Create({}: Props) {
                                                         type="date"
                                                         value={data.conditions.from_date ?? ''}
                                                         onChange={(e) =>
-                                                            setData({
+                                                            setData((prev) => ({
+                                                                ...prev,
                                                                 conditions: {
-                                                                    ...data.conditions,
+                                                                    ...prev.conditions,
                                                                     from_date: e.target.value,
                                                                 },
-                                                            })
+                                                            }))
                                                         }
                                                     />
                                                 </div>
@@ -203,12 +233,13 @@ export default function Create({}: Props) {
                                                         type="date"
                                                         value={data.conditions.to_date ?? ''}
                                                         onChange={(e) =>
-                                                            setData({
+                                                            setData((prev) => ({
+                                                                ...prev,
                                                                 conditions: {
-                                                                    ...data.conditions,
+                                                                    ...prev.conditions,
                                                                     to_date: e.target.value,
                                                                 },
-                                                            })
+                                                            }))
                                                         }
                                                     />
                                                 </div>
@@ -226,12 +257,13 @@ export default function Create({}: Props) {
                                             value={data.conditions.threshold ?? ''}
                                             onChange={(e) => {
                                                 const threshold = parseInt(e.target.value, 10);
-                                                setData({
+                                                setData((prev) => ({
+                                                    ...prev,
                                                     conditions: {
-                                                        ...data.conditions,
+                                                        ...prev.conditions,
                                                         threshold: Number.isNaN(threshold) ? undefined : threshold,
                                                     },
-                                                });
+                                                }));
                                             }}
                                             placeholder="Cantidad mínima de stock"
                                         />
@@ -243,13 +275,13 @@ export default function Create({}: Props) {
 
                                 {data.type === 'birthday' && (
                                     <div className="rounded border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
-                                        Este trigger se activa automáticamente en el cumpleaños del usuario. No es necesario ingresar condiciones adicionales.
+                                        Esta notificación se activa automáticamente en el cumpleaños del usuario. No es necesario ingresar condiciones adicionales.
                                     </div>
                                 )}
 
                                 {!data.type && (
                                     <div className="rounded border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
-                                        Selecciona un tipo de trigger para ver los campos de condiciones.
+                                        Selecciona un tipo de notificación para ver los campos de condiciones.
                                     </div>
                                 )}
 
@@ -301,6 +333,6 @@ export default function Create({}: Props) {
                     </CardContent>
                 </Card>
             </div>
-        </>
+        </AppLayout>
     );
 }
