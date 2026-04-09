@@ -49,6 +49,45 @@ export default function Index({ triggers }: Props) {
         }
     };
 
+    const getConditionsLabel = (trigger: NotificationTrigger) => {
+        const conditions = trigger.conditions || {};
+
+        switch (trigger.type) {
+            case 'sales_goal': {
+                const count = conditions.sales_count ?? 'número desconocido';
+                const period = conditions.period || 'periodo no definido';
+                if (period === 'custom') {
+                    const fromDate = conditions.from_date ? new Date(conditions.from_date).toLocaleDateString() : 'sin fecha inicio';
+                    const toDate = conditions.to_date ? new Date(conditions.to_date).toLocaleDateString() : 'sin fecha fin';
+                    return `Al menos ${count} ventas desde ${fromDate} hasta ${toDate}`;
+                }
+                const newLocal = {
+                    day: 'hoy',
+                    week: 'esta semana',
+                    month: 'este mes',
+                    year: 'este año',
+                }[period as keyof typeof periodMap] ?? period;
+                const periodMap = {
+                    day: 'hoy',
+                    week: 'esta semana',
+                    month: 'este mes',
+                    year: 'este año',
+                };
+                const periodLabel = periodMap[period as keyof typeof periodMap] || period;
+                
+                return `Al menos ${count} ventas ${periodLabel}`;
+            }
+            case 'low_stock': {
+                const threshold = conditions.threshold ?? 'desconocido';
+                return `Stock menor o igual a ${threshold}`;
+            }
+            case 'birthday':
+                return 'Cumpleaños del usuario';
+            default:
+                return JSON.stringify(trigger.conditions);
+        }
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
                     <div className="p-6">
@@ -105,7 +144,7 @@ export default function Index({ triggers }: Props) {
                                 <div className="space-y-2">
                                     <p><strong>Título:</strong> {trigger.title_template}</p>
                                     <p><strong>Mensaje:</strong> {trigger.message_template}</p>
-                                    <p><strong>Condiciones:</strong> {JSON.stringify(trigger.conditions)}</p>
+                                    <p><strong>Condiciones:</strong> {getConditionsLabel(trigger)}</p>
                                 </div>
                             </CardContent>
                         </Card>

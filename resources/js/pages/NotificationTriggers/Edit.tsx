@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Head, useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,6 +11,14 @@ import { ArrowLeft } from 'lucide-react';
 import { route } from 'ziggy-js';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
+
+interface NotificationTriggerConditions {
+    sales_count?: number;
+    period?: string;
+    from_date?: string;
+    to_date?: string;
+    threshold?: number;
+}
 
 interface NotificationTrigger {
     id: number;
@@ -34,13 +42,10 @@ export default function Edit({ trigger }: Props) {
                 href: '/notifications-triggers.edit',
             },
           ];
-    const [conditionsJson, setConditionsJson] = useState(
-        JSON.stringify(trigger.conditions || {}, null, 2),
-    );
 
-    const { data, setData, put, transform, processing, errors } = useForm<{
+    const { data, setData, put, processing, errors } = useForm<{
         type: string;
-        conditions: Record<string, any>;
+        conditions: NotificationTriggerConditions;
         title_template: string;
         message_template: string;
         target_type: string;
@@ -58,15 +63,7 @@ export default function Edit({ trigger }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-
-        try {
-            const conditions = JSON.parse(conditionsJson);
-            transform((formData) => ({ ...formData, conditions }));
-            put(route('notification-triggers.update', trigger.id));
-            transform((formData) => formData);
-        } catch (error) {
-            alert('JSON de condiciones inválido');
-        }
+        put(route('notification-triggers.update', trigger.id));
     };
 
     const typeOptions = [
@@ -153,39 +150,160 @@ export default function Edit({ trigger }: Props) {
                             )}
 
                             <div>
-                                <Label htmlFor="conditions">Condiciones (JSON)</Label>
-                                <Textarea
-                                    id="conditions"
-                                    value={conditionsJson}
-                                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                                        setConditionsJson(e.target.value)
-                                    }
-                                    placeholder='{"sales_count": 10, "period": "month"}'
-                                    rows={3}
-                                />
+                                <Label htmlFor="conditions">Condiciones del Trigger</Label>
+                                <p className="text-sm text-slate-500 mb-2">
+                                    Elige los valores que activan este trigger. Los campos disponibles cambian según el tipo seleccionado.
+                                </p>
+
+                                {data.type === 'sales_goal' && (
+                                    <div className="space-y-4">
+                                        <div>
+                                            <Label htmlFor="sales_count">Cantidad de Ventas</Label>
+                                            <Input
+                                                id="sales_count"
+                                                type="number"
+                                                value={data.conditions.sales_count ?? ''}
+                                                onChange={(e) => {
+                                                    const salesCount = parseInt(e.target.value, 10);
+                                                    setData({
+                                                        conditions: {
+                                                            ...data.conditions,
+                                                            sales_count: Number.isNaN(salesCount) ? undefined : salesCount,
+                                                        },
+                                                    });
+                                                }}
+                                                placeholder="Número mínimo de ventas"
+                                            />
+                                        </div>
+                                        <div>
+                                            <Label htmlFor="period">Periodo</Label>
+                                            <Select
+                                                value={data.conditions.period || ''}
+                                                onValueChange={(value) =>
+                                                    setData({
+                                                        conditions: {
+                                                            ...data.conditions,
+                                                            period: value,
+                                                        },
+                                                    })
+                                                }
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Seleccionar periodo" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="day">Hoy</SelectItem>
+                                                    <SelectItem value="week">Esta semana</SelectItem>
+                                                    <SelectItem value="month">Este mes</SelectItem>
+                                                    <SelectItem value="year">Este año</SelectItem>
+                                                    <SelectItem value="custom">Rango personalizado</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        {data.conditions.period === 'custom' && (
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div>
+                                                    <Label htmlFor="from_date">Desde</Label>
+                                                    <Input
+                                                        id="from_date"
+                                                        type="date"
+                                                        value={data.conditions.from_date ?? ''}
+                                                        onChange={(e) =>
+                                                            setData({
+                                                                conditions: {
+                                                                    ...data.conditions,
+                                                                    from_date: e.target.value,
+                                                                },
+                                                            })
+                                                        }
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <Label htmlFor="to_date">Hasta</Label>
+                                                    <Input
+                                                        id="to_date"
+                                                        type="date"
+                                                        value={data.conditions.to_date ?? ''}
+                                                        onChange={(e) =>
+                                                            setData({
+                                                                conditions: {
+                                                                    ...data.conditions,
+                                                                    to_date: e.target.value,
+                                                                },
+                                                            })
+                                                        }
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {data.type === 'low_stock' && (
+                                    <div>
+                                        <Label htmlFor="threshold">Límite de Stock</Label>
+                                        <Input
+                                            id="threshold"
+                                            type="number"
+                                            value={data.conditions.threshold ?? ''}
+                                            onChange={(e) => {
+                                                const threshold = parseInt(e.target.value, 10);
+                                                setData({
+                                                    conditions: {
+                                                        ...data.conditions,
+                                                        threshold: Number.isNaN(threshold) ? undefined : threshold,
+                                                    },
+                                                });
+                                            }}
+                                            placeholder="Cantidad mínima de stock"
+                                        />
+                                        <p className="text-sm text-slate-500 mt-2">
+                                            Se enviará la notificación cuando el stock del producto esté por debajo de este valor.
+                                        </p>
+                                    </div>
+                                )}
+
+                                {data.type === 'birthday' && (
+                                    <div className="rounded border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
+                                        Este trigger se activa automáticamente en el cumpleaños del usuario. No es necesario ingresar condiciones adicionales.
+                                    </div>
+                                )}
+
+                                {!data.type && (
+                                    <div className="rounded border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
+                                        Selecciona un tipo de trigger para ver los campos de condiciones.
+                                    </div>
+                                )}
+
                                 {errors.conditions && <p className="text-red-500 text-sm">{errors.conditions}</p>}
                             </div>
 
                             <div>
-                                <Label htmlFor="title_template">Plantilla del Título</Label>
+                                <Label htmlFor="title_template">Título de la notificación</Label>
                                 <Input
                                     id="title_template"
                                     value={data.title_template}
                                     onChange={(e) => setData('title_template', e.target.value)}
-                                    placeholder="¡Felicitaciones {user_name}!"
+                                    placeholder="Ej. ¡Felicitaciones, {user_name}!"
                                 />
+                                <p className="text-sm text-slate-500 mt-1">
+                                    Puedes usar variables como <span className="font-mono">{`{user_name}`}</span>, <span className="font-mono">{`{sales_count}`}</span> o <span className="font-mono">{`{period}`}</span> según el tipo de trigger.
+                                </p>
                                 {errors.title_template && <p className="text-red-500 text-sm">{errors.title_template}</p>}
                             </div>
 
                             <div>
-                                <Label htmlFor="message_template">Plantilla del Mensaje</Label>
+                                <Label htmlFor="message_template">Texto de la notificación</Label>
                                 <Textarea
                                     id="message_template"
                                     value={data.message_template}
                                     onChange={(e: { target: { value: string } }) => setData('message_template', e.target.value)}
-                                    placeholder="Has alcanzado {sales_count} ventas este {period}."
+                                    placeholder="Ej. Has alcanzado 10 ventas este mes."
                                     rows={3}
                                 />
+                                <p className="text-sm text-slate-500 mt-1">
+                                    Escribe el mensaje que verá el usuario. Usa variables como <span className="font-mono">{`{user_name}`}</span> para personalizarlo.
+                                </p>
                                 {errors.message_template && <p className="text-red-500 text-sm">{errors.message_template}</p>}
                             </div>
 

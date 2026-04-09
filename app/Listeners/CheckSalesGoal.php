@@ -5,6 +5,7 @@ namespace App\Listeners;
 use App\Events\SaleCompleted;
 use App\Models\NotificationTrigger;
 use App\Services\NotificationService;
+use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
@@ -41,14 +42,28 @@ class CheckSalesGoal implements ShouldQueue
                 'week' => now()->startOfWeek(),
                 'month' => now()->startOfMonth(),
                 'year' => now()->startOfYear(),
+                'custom' => (!empty($conditions['from_date']) && !empty($conditions['to_date']))
+                    ? Carbon::parse($conditions['from_date'])->startOfDay()
+                    : now()->startOfMonth(),
                 default => now()->startOfMonth(),
             };
 
-            $userSalesCount = $user->sales()
-                ->where('created_at', '>=', $startDate)
-                ->count();
+            $endDate = now();
+            if ($period === 'custom' && !empty($conditions['to_date'])) {
+                $endDate = Carbon::parse($conditions['to_date'])->endOfDay();
+            }
+
+            $query = $user->sales()->where('created_at', '>=', $startDate);
+            if ($period === 'custom' && !empty($conditions['to_date'])) {
+                $query->where('created_at', '<=', $endDate);
+            }
+
+            $userSalesCount = $query->count();
 
             if ($userSalesCount >= $salesCount) {
+                if ($period === 'custom' && !empty($conditions['from_date']) && !empty($conditions['to_date'])) {
+                    $period = "desde {$conditions['from_date']} hasta {$conditions['to_date']}";
+                }
                 // Send notification
                 $title = $this->replacePlaceholders($trigger->title_template, [
                     'user_name' => $user->name,
