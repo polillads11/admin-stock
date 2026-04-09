@@ -163,6 +163,9 @@ class SaleController extends Controller
                 $stockRecord->stock -= $quantity;
                 $stockRecord->save();
 
+                // Dispatch stock updated event
+                \App\Events\StockUpdated::dispatch($stockRecord);
+
                 StockMovement::create([
                     'product_local_stock_id' => $stockRecord->id,
                     'quantity' => -$quantity,
@@ -173,6 +176,9 @@ class SaleController extends Controller
                     'created_by' => auth()->id(),
                 ]);
             }
+
+            // Dispatch event after successful sale
+            \App\Events\SaleCompleted::dispatch($sale);
         });
 
         $message = 'Venta registrada correctamente.';

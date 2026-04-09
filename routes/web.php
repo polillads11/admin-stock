@@ -15,6 +15,7 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\OfferController;
 use App\Http\Controllers\CashMovementController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\NotificationTriggerController;
 
 Route::get('/', function () {
     return Inertia::render('welcome', [
@@ -220,12 +221,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     //Notifications routes
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/create', [NotificationController::class, 'create'])->name('notifications.create');
+    Route::post('/notifications', [NotificationController::class, 'store'])->name('notifications.store');
     Route::get('/notifications/unread', [NotificationController::class, 'unread'])->name('notifications.unread');
     Route::put('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
     Route::put('/notifications/{notification}/unread', [NotificationController::class, 'markAsUnread'])->name('notifications.markAsUnread');
     Route::put('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllRead');
     Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
     Route::delete('/notifications', [NotificationController::class, 'destroyAll'])->name('notifications.destroyAll');
+
+    // Notification Triggers routes
+    Route::resource('notification-triggers', NotificationTriggerController::class);
 
     // Example testing routes for notifications
     Route::get('/example/notify-user/{userId}', [ExampleNotificationController::class, 'notifyUser']);

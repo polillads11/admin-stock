@@ -17,7 +17,8 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Eye, EyeOff, Trash2 } from 'lucide-react';
-import { Head, usePage } from '@inertiajs/react';
+import { Head, usePage, Link } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 import axios from 'axios';
 import { useState } from 'react';
 import AppLayout from '@/layouts/app-layout';
@@ -216,6 +217,20 @@ export default function NotificationsIndex() {
                             <div className="flex flex-col gap-4">
                                 {/* Controls */}
                                 <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
+                                    <div className="flex items-center gap-2">
+                                        <Link
+                                            href={route('notifications.create')}
+                                            className="rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                                        >
+                                            Crear notificación
+                                        </Link>
+                                        <Link
+                                            href={route('notification-triggers.index')}
+                                            className="rounded-md bg-green-600 px-3 py-2 text-sm font-medium text-white hover:bg-green-700"
+                                        >
+                                            Gestionar Triggers
+                                        </Link>
+                                    </div>
                                     <div className="flex items-center gap-2">
                                         <label
                                             htmlFor="filter"
