@@ -4,6 +4,7 @@ import { route } from 'ziggy-js';
 import AppLayout from "@/layouts/app-layout";
 import { type BreadcrumbItem } from '@/types';
 import BarcodeScannerModal from "../../components/BarcodeScannerModal";
+import InvoiceOCR from "@/components/ocr/InvoiceOCR";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -160,6 +161,7 @@ export default function Create({ categories, locals }: Props) {
         onClose={() => setScannerOpen(false)}
         onDetected={handleBarcodeDetected}
       />
+      <InvoiceOCR />
     </AppLayout>
   );
 }

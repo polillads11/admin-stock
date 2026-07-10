@@ -16,6 +16,7 @@ use App\Http\Controllers\OfferController;
 use App\Http\Controllers\CashMovementController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\NotificationTriggerController;
+use App\Http\Controllers\OCRController;
 
 Route::get('/', function () {
     return Inertia::render('welcome', [
@@ -238,6 +239,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/example/notify-maintenance', [ExampleNotificationController::class, 'notifyMaintenance']);
     Route::get('/example/notify-product', [ExampleNotificationController::class, 'notifyProductCreated']);
     Route::get('/example/notify-error', [ExampleNotificationController::class, 'notifyError']);
+
+    // TESSERACT OCR
+    Route::post('/ocr/invoice', [OCRController::class, 'scan']);
 });
 
 require __DIR__.'/settings.php';
