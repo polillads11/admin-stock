@@ -52,7 +52,9 @@ export default function InvoiceOCR() {
             </button>
 
             {results.length > 0 && (
-                <OCRReviewTable results={results} />
+                <OCRReviewTable
+                    results={results}
+                />
             )}
 
             <pre className="whitespace-pre-wrap">

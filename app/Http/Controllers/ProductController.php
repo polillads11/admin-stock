@@ -16,9 +16,11 @@ class ProductController extends Controller
     {
         $products = Product::with(['category'])
             ->withSum('localStocks as total_stock', 'stock')
-            ->when($request->search, fn($q) =>
+            ->when(
+                $request->search,
+                fn($q) =>
                 $q->where('name', 'like', "%{$request->search}%")
-                ->orWhere('sku', 'like', "%{$request->search}%")
+                    ->orWhere('sku', 'like', "%{$request->search}%")
             )
             ->orderBy('id', 'desc')
             ->paginate(10)
@@ -39,22 +41,24 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'sku' => 'required|string|unique:products,sku',
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric|min:0',
-            'description' => 'nullable|string',
-            'category_id' => 'nullable|exists:categories,id'
-            
-        ],
-        [
-            'sku.required' => 'El SKU es obligatorio.',
-            'sku.unique' => 'El SKU ya existe. Por favor, ingrese uno diferente.',
-            'name.required' => 'El nombre del producto es obligatorio.',
-            'price.required' => 'El precio es obligatorio.',
-            'price.numeric' => 'El precio debe ser un número.',
-            'price.min' => 'El precio no puede ser negativo.',
-        ]);
+        $data = $request->validate(
+            [
+                'sku' => 'required|string|unique:products,sku',
+                'name' => 'required|string|max:255',
+                'price' => 'required|numeric|min:0',
+                'description' => 'nullable|string',
+                'category_id' => 'nullable|exists:categories,id'
+
+            ],
+            [
+                'sku.required' => 'El SKU es obligatorio.',
+                'sku.unique' => 'El SKU ya existe. Por favor, ingrese uno diferente.',
+                'name.required' => 'El nombre del producto es obligatorio.',
+                'price.required' => 'El precio es obligatorio.',
+                'price.numeric' => 'El precio debe ser un número.',
+                'price.min' => 'El precio no puede ser negativo.',
+            ]
+        );
 
         DB::transaction(function () use ($data) {
             $product = Product::create($data);
@@ -85,27 +89,28 @@ class ProductController extends Controller
 
     public function update(Request $request, Product $product)
     {
-        $data = $request->validate([
-            'sku' => 'required|string|unique:products,sku,' . $product->id,
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'category_id' => 'nullable|exists:categories,id',
-            'price' => 'required|numeric|min:0'
-        ],
-        [
-            'sku.required' => 'El SKU es obligatorio.',
-            'sku.unique' => 'El SKU ya existe. Por favor, ingrese uno diferente.',
-            'name.required' => 'El nombre del producto es obligatorio.',
-            'price.required' => 'El precio es obligatorio.',
-            'price.numeric' => 'El precio debe ser un número.',
-            'price.min' => 'El precio no puede ser negativo.',
-        ]);
+        $data = $request->validate(
+            [
+                'sku' => 'required|string|unique:products,sku,' . $product->id,
+                'name' => 'required|string|max:255',
+                'description' => 'nullable|string',
+                'category_id' => 'nullable|exists:categories,id',
+                'price' => 'required|numeric|min:0'
+            ],
+            [
+                'sku.required' => 'El SKU es obligatorio.',
+                'sku.unique' => 'El SKU ya existe. Por favor, ingrese uno diferente.',
+                'name.required' => 'El nombre del producto es obligatorio.',
+                'price.required' => 'El precio es obligatorio.',
+                'price.numeric' => 'El precio debe ser un número.',
+                'price.min' => 'El precio no puede ser negativo.',
+            ]
+        );
 
         $product->update($data);
 
         return redirect()->route('products.index')
             ->with('success', 'Producto actualizado correctamente.');
-        
     }
 
     public function destroy(Product $product)
@@ -130,10 +135,10 @@ class ProductController extends Controller
             ->where('local_id', $localId)
             ->whereHas('product', function ($q) use ($query) {
                 $q->where('name', 'like', "%{$query}%")
-                ->orWhere('sku', 'like', "%{$query}%");
+                    ->orWhere('sku', 'like', "%{$query}%");
             })
             ->get()
-            ->map(fn ($pls) => [
+            ->map(fn($pls) => [
                 'id' => $pls->product->id,
                 'name' => $pls->product->name,
                 'price' => $pls->product->price,
@@ -156,7 +161,7 @@ class ProductController extends Controller
             ->orderBy(Product::select('name')
                 ->whereColumn('products.id', 'product_local_stocks.product_id'))
             ->get()
-            ->map(fn ($pls) => [
+            ->map(fn($pls) => [
                 'id' => $pls->product->id,
                 'name' => $pls->product->name,
                 'price' => $pls->product->price,
@@ -167,8 +172,8 @@ class ProductController extends Controller
     }
 
     public function show(Product $product)
-        {
-            $product->load([
+    {
+        $product->load([
             'category',
             'localStocks.local',
         ]);
@@ -204,5 +209,26 @@ class ProductController extends Controller
             'price' => $productStock->product->price,
             'stock' => $productStock->stock,
         ]);
+    }
+
+    public function searchOCR(Request $request)
+    {
+        $query = trim($request->input('q'));
+
+        if (strlen($query) < 2) {
+            return response()->json([]);
+        }
+
+        return Product::query()
+            ->where('name', 'like', "%{$query}%")
+            ->orWhere('sku', 'like', "%{$query}%")
+            ->orderBy('name')
+            ->limit(15)
+            ->get([
+                'id',
+                'name',
+                'price',
+                'sku'
+            ]);
     }
 }

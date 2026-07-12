@@ -243,6 +243,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // TESSERACT OCR
     Route::post('/ocr/invoice', [OCRController::class, 'scan']);
     Route::post('/ocr/import', [OCRController::class, 'import']);
+    Route::get('/search-product', [ProductController::class, 'searchOCR'])
+        ->name('ocr.search-product');
 });
 
 require __DIR__.'/settings.php';

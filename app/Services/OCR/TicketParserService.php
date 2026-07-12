@@ -5,30 +5,48 @@ namespace App\Services\OCR;
 class TicketParserService
 {
     /**
-     * Palabras que NO representan productos
+     * Palabras que indican que la línea NO es un producto.
      */
     protected array $ignoreWords = [
+
         'TOTAL',
         'SUBTOTAL',
+        'DESCUENTO',
+        'PROMOCION',
+        'PROMOCIÓN',
+
         'IVA',
+        'CUIT',
+        'RESPONSABLE',
+        'CONSUMIDOR',
+        'TRANSPARENCIA',
+        'REGIMEN',
+        'RÉGIMEN',
+        'PROTECCIÓN',
+
         'RECIBI',
         'EFECTIVO',
-        'CUIT',
+        'TARJETA',
+        'CAMBIO',
+
         'FECHA',
-        'CONSUMIDOR',
-        'RESPONSABLE',
-        'TRANSPARENCIA',
-        'PROTECCIÓN',
-        'REGIMEN',
-        'COD.',
-        'P.V.',
-        'NRO.',
         'HORA',
-        'BOLSA',
+        'INICIO',
+        'ACTIVIDADES',
+        'DIRECCION',
+        'DIRECCIÓN',
+
+        'COD.',
+        'CODIGO',
+        'P.V.',
+        'NRO',
+        'TIQUE',
+
+        'SESHIA',
     ];
 
     /**
-     * Parsea texto OCR y devuelve productos detectados
+     * Devuelve únicamente los productos encontrados.
      */
     public function parse(string $text): array
     {
@@ -40,63 +58,70 @@ class TicketParserService
 
             $line = trim($line);
 
-            if (empty($line)) {
+            if ($line === '') {
                 continue;
             }
 
-            // Ignorar líneas cortas
-            if (mb_strlen($line) < 5) {
+            if (mb_strlen($line) < 4) {
                 continue;
             }
 
-            // Ignorar líneas del sistema
             if ($this->shouldIgnore($line)) {
                 continue;
             }
 
-            /**
-             * Detectar:
+            /*
+             * Busca el ÚLTIMO importe de la línea.
              *
-             * TEXTO .... 1234,00
+             * Ejemplos:
+             *
+             * COCA COLA           2300,00
+             * COCA COLA        $ 2.300,00
+             * COCA COLA.........2300,00
              */
-            if (
-                preg_match(
-                    '/^(.+?)\s+(\d+[.,]\d{2})$/',
-                    $line,
-                    $matches
-                )
-            ) {
 
-                $description = trim($matches[1]);
-
-                $price = $matches[2];
-
-                // Limpiar descripción
-                $description = $this->cleanDescription($description);
-
-                // Convertir precio
-                $price = $this->normalizePrice($price);
-
-                // Validaciones mínimas
-                if (
-                    empty($description) ||
-                    $price <= 0
-                ) {
-                    continue;
-                }
-
-                $products[] = [
-                    'description' => $description,
-                    'price' => $price,
-                ];
+            if (!preg_match(
+                '/^(.*?)(?:\s+\$?\s*)([\d\.]+,\d{2})$/u',
+                $line,
+                $matches
+            )) {
+                continue;
             }
+
+            $description = $this->cleanDescription($matches[1]);
+
+            $price = $this->normalizePrice($matches[2]);
+
+            if ($description === '') {
+                continue;
+            }
+
+            if ($price <= 0) {
+                continue;
+            }
+
+            /*
+             * Evita líneas como:
+             *
+             * 2.000 x 1.500,00
+             * 0.100 x 15.400,00
+             */
+
+            if (preg_match('/^\d+[.,]?\d*\s*x\s*\d+/i', $description)) {
+                continue;
+            }
+
+            $products[] = [
+                'description' => $description,
+                'price' => $price,
+            ];
         }
 
         return $products;
     }
 
     /**
-     * Ignorar líneas irrelevantes
+     * Determina si la línea pertenece al encabezado o pie.
      */
     protected function shouldIgnore(string $line): bool
     {
@@ -113,16 +138,32 @@ class TicketParserService
     }
 
     /**
-     * Limpiar descripción producto
+     * Limpia el nombre del producto.
      */
     protected function cleanDescription(string $description): string
     {
         $description = mb_strtoupper($description);
 
-        // Reemplazos comunes OCR
-        $description = str_replace('*', ' ', $description);
+        // Caracteres frecuentes del OCR
+        $description = str_replace(
+            [
+                '*',
+                '$',
+                '=',
+                '.',
+                ':',
+                ';',
+                ',',
+                '_',
+                '|',
+                '(',
+                ')'
+            ],
+            ' ',
+            $description
+        );
 
-        // Quitar múltiples espacios
+        // Eliminar espacios múltiples
         $description = preg_replace('/\s+/', ' ', $description);
 
         return trim($description);
@@ -130,21 +171,23 @@ class TicketParserService
 
     /**
      * Convierte:
+     *
      * 3.500,00
      * 3500,00
-     * 3500.00
+     * $3.500,00
      *
-     * → 3500.00
+     * a
+     *
+     * 3500.00
      */
     protected function normalizePrice(string $price): float
     {
-        // quitar separador miles
+        $price = preg_replace('/[^\d,\.]/', '', $price);
+
         $price = str_replace('.', '', $price);
 
-        // coma decimal → punto
         $price = str_replace(',', '.', $price);
 
         return (float) $price;
     }
 }
-
