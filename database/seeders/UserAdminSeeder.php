@@ -8,16 +8,14 @@ use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
-class DatabaseSeeder extends Seeder
+class UserAdminSeeder extends Seeder
 {
     /**
-     * Seed the application's database.
+     * Run the database seeds.
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        /*$user = User::firstOrCreate(
+        $user = User::firstOrCreate(
             ['email' => 'admin@admin-stock.com'],
             [
                 'name' => 'Admin User',
@@ -26,16 +24,10 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        // 3. Obtener todos los permisos y asignarlos al usuario
         $permissions = Permission::all();
-        $user->revokePermissionTo($permissions);
-
-        $user->syncRoles($request->roles);*/
-
-        $this->call([
-            PermissionSeeder::class,
-            UserAdminSeeder::class,
-            
-            //ProductSeeder::class,
-        ]);
+        
+        // El método givePermissionTo() acepta directamente una colección o array
+        $user->givePermissionTo($permissions);
     }
 }

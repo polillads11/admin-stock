@@ -25,4 +25,4 @@ Sistema de gestión de inventario desarrollado con Laravel + React + TypeScript.
 composer install
 npm install
 php artisan migrate
-npm run dev
+composer run dev
