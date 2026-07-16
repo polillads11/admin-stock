@@ -233,6 +233,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Notification Triggers routes
     Route::resource('notification-triggers', NotificationTriggerController::class);
+    Route::delete('/notification-triggers/{id}', [NotificationTriggerController::class, 'destroy'])->name('notification-triggers.destroy');
 
     // Example testing routes for notifications
     Route::get('/example/notify-user/{userId}', [ExampleNotificationController::class, 'notifyUser']);

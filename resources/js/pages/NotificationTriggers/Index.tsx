@@ -1,5 +1,5 @@
 import React from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -88,6 +88,14 @@ export default function Index({ triggers }: Props) {
         }
     };
 
+    function handleDelete({ id }: { id: number; }): void {
+        router.delete(route('notification-triggers.destroy', id), {
+            onSuccess: () => {
+                // Trigger will be removed from the list after successful deletion
+            },
+        });
+    }
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
                     <div className="p-6">
@@ -131,7 +139,7 @@ export default function Index({ triggers }: Props) {
                                             size="sm"
                                             onClick={() => {
                                                 if (confirm('¿Eliminar esta notificación?')) {
-                                                    // Handle delete
+                                                    handleDelete({ id: trigger.id });
                                                 }
                                             }}
                                         >
